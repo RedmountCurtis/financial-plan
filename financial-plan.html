@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redmount Financial Plan</title>
+<style>
+  :root{
+    --navy:#002347; --navy-2:#01315f; --cobalt:#2f6fed; --cobalt-dim:#5b8bf0;
+    --paper:#f6f7fa; --card:#ffffff; --line:#e2e6ee; --ink:#0e1a2b; --ink-dim:#5b6b82;
+    --good:#177350; --good-bg:#e7f5ee; --warn:#8a5a00; --warn-bg:#fff3de;
+    --bad:#9c2b2b; --bad-bg:#fbe9e9; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; background:var(--paper); color:var(--ink);}
+  .shell{display:flex; min-height:100vh;}
+  .sidebar{width:250px; flex-shrink:0; background:var(--navy); color:#cfe0ff; padding:22px 18px; display:flex; flex-direction:column; gap:20px; position:sticky; top:0; height:100vh; overflow-y:auto;}
+  .brand{font-size:15px; font-weight:700; color:#fff;}
+  .brand small{display:block; font-weight:400; color:#9fb8e6; font-size:11px; margin-top:2px;}
+  .client-list{display:flex; flex-direction:column; gap:2px; overflow-y:auto;}
+  .client-item{padding:9px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:#b7c9e8; display:flex; justify-content:space-between; align-items:center;}
+  .client-item:hover{color:#fff;}
+  .client-item.active{background:var(--navy-2); color:#fff; font-weight:600;}
+  .client-item .gapdot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+  .side-foot{margin-top:auto; font-size:11px; color:#7d92b8; line-height:1.5;}
+  .tool-switcher-label{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#7d92b8; font-weight:600; margin-bottom:6px;}
+  .tool-switcher{width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#fff; font-family:inherit; font-size:12.5px; padding:8px 9px; border-radius:6px;}
+  .tool-switcher option{color:#111;}
+  .nav-divider{height:1px; background:rgba(255,255,255,0.12); margin:4px 0;}
+  .main{flex:1; padding:32px 40px; max-width:1220px;}
+  h1{font-size:22px; margin:0 0 4px;}
+  .sub{color:var(--ink-dim); font-size:13.5px; margin:0 0 22px;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px; margin-bottom:22px;}
+  .panel h2{font-size:15px; margin:0 0 4px;}
+  .panel .desc{color:var(--ink-dim); font-size:12.5px; margin:0 0 16px;}
+  .row{display:flex; gap:14px; flex-wrap:wrap;}
+  .field{display:flex; flex-direction:column; gap:5px; margin-bottom:14px; flex:1; min-width:190px;}
+  .field label{font-size:11px; font-weight:600; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.03em;}
+  input, select, textarea{border:1px solid var(--line); border-radius:7px; padding:8px 10px; font-size:13.5px; font-family:inherit; background:#fff; color:var(--ink); width:100%;}
+  input[type="radio"], input[type="checkbox"]{width:auto; border:none; padding:0; background:none; border-radius:0; accent-color:var(--cobalt); flex-shrink:0;}
+  input[type="range"]{padding:0; accent-color:var(--cobalt);}
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--cobalt-dim); outline-offset:0; border-color:var(--cobalt);}
+  .btn{background:var(--cobalt); color:#fff; border:none; border-radius:7px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer;}
+  .btn:hover{background:#2660d4;}
+  .btn.secondary{background:#fff; color:var(--navy); border:1px solid var(--line);}
+  .btn.secondary:hover{background:#f0f3f8;}
+  .btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line); padding:6px 10px; font-size:12px;}
+  .btn.ghost:hover{background:#f0f3f8; color:var(--navy);}
+  .btn.danger{background:transparent; color:var(--bad); border:1px solid #efc6c6; padding:6px 10px; font-size:12px;}
+  .btn.danger:hover{background:var(--bad-bg);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .tabs{display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line); overflow-x:auto;}
+  .tab{padding:10px 14px; font-size:13px; font-weight:600; color:var(--ink-dim); cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap;}
+  .tab.active{color:var(--cobalt); border-color:var(--cobalt);}
+  .subhead{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--navy); margin:20px 0 10px;}
+  .subhead:first-child{margin-top:0;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-dim); border-bottom:1px solid var(--line); padding:8px 10px; font-weight:600;}
+  td{padding:8px 10px; border-bottom:1px solid #eef1f6; vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .empty{border:1px dashed var(--line); border-radius:8px; padding:24px; text-align:center; color:var(--ink-dim); font-size:13px;}
+  .gauge-wrap{display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start;}
+  .bar-track{height:10px; background:#eef1f6; border-radius:99px; margin:8px 0; position:relative; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,#2f6fed,#7aa5f5);}
+  .gap-flag{display:inline-block; margin-top:10px; padding:5px 12px; border-radius:99px; font-size:12px; font-weight:700;}
+  .gap-flag.aligned{background:var(--good-bg); color:var(--good);}
+  .gap-flag.over{background:var(--bad-bg); color:var(--bad);}
+  .gap-flag.under{background:var(--warn-bg); color:var(--warn);}
+  .summary-cards{display:flex; gap:14px; margin-bottom:22px; flex-wrap:wrap;}
+  .scard{flex:1; min-width:150px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px;}
+  .scard .label{font-size:11px; text-transform:uppercase; color:var(--ink-dim); letter-spacing:.03em;}
+  .scard .value{font-size:26px; font-weight:800; margin-top:4px; color:var(--navy);}
+  .scard.warn .value{color:var(--warn);}
+  .scard.bad .value{color:var(--bad);}
+  .scard.good .value{color:var(--good);}
+  .divider{height:1px; background:var(--line); margin:18px 0;}
+  .flag{padding:2px 9px; border-radius:6px; font-size:11px; font-weight:600; display:inline-block; background:#eef1f6; color:var(--ink-dim);}
+  .flag.ok{background:var(--good-bg); color:var(--good);}
+  .flag.err{background:var(--bad-bg); color:var(--bad);}
+  .flag.warn{background:var(--warn-bg); color:var(--warn);}
+  .compact{font-size:12.5px !important; padding:5px 8px !important;}
+  .signout-link{color:#b7c9e8;}
+  .signout-link:hover{color:#fff;}
+  .note{background:var(--warn-bg); border:1px solid #f0dcaa; color:#6b4a00; border-radius:8px; padding:12px 14px; font-size:12.5px; line-height:1.5; margin-bottom:18px;}
+  .note strong{color:#3d2c00;}
+  .toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+  footer.tool-foot{font-size:11.5px; color:var(--ink-dim); margin-top:6px; text-align:right;}
+  .rowline{display:flex; gap:8px; align-items:center; margin-bottom:6px;}
+  .rowline .grow{flex:1;}
+  .removeX{background:none; border:none; color:var(--ink-dim); cursor:pointer; font-size:16px; line-height:1; padding:4px;}
+  .removeX:hover{color:var(--bad);}
+  .addRowBtn{font-size:12.5px; font-weight:600; color:var(--cobalt); background:none; border:1px dashed var(--cobalt-dim); border-radius:7px; padding:7px 12px; cursor:pointer; margin-top:4px;}
+  .addRowBtn:hover{background:#f5f8ff;}
+
+  /* Probability of success gauge */
+  .pos-meter{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
+  .pos-num{font-size:48px; font-weight:800;}
+  .pos-num.good{color:var(--good);} .pos-num.warn{color:var(--warn);} .pos-num.bad{color:var(--bad);}
+  .pos-label{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-dim); font-weight:700; margin-top:2px;}
+  .pos-track{height:16px; background:#eef1f6; border-radius:99px; overflow:hidden; flex:1; min-width:220px;}
+  .pos-fill{height:100%; border-radius:99px; transition:width .3s;}
+
+  /* What-if sliders */
+  .slider-row{margin-bottom:18px;}
+  .slider-row .sr-head{display:flex; justify-content:space-between; font-size:12.5px; font-weight:600; color:var(--ink); margin-bottom:6px;}
+  .slider-row .sr-head .sr-val{color:var(--cobalt); font-weight:700;}
+
+  .authgate{position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; z-index:200; padding:24px;}
+  .authcard{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); width:100%; max-width:380px; padding:32px 32px 26px; box-shadow:0 8px 24px -12px rgba(0,35,71,0.18);}
+  .authcard .auth-logo{font-size:15px; font-weight:800; color:var(--navy); letter-spacing:.02em; margin-bottom:6px;}
+  .authcard h1{font-size:21px; margin:14px 0 4px; color:var(--navy);}
+  .authcard p.sub{font-size:12.5px; color:var(--ink-dim); margin:0 0 22px;}
+  .authcard label{display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-dim); margin:16px 0 5px;}
+  .authcard input{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px; font-size:13.5px; font-family:inherit; box-sizing:border-box;}
+  .authcard input:focus{outline:none; border-color:var(--cobalt);}
+  .authcard button{width:100%; margin-top:20px; padding:11px; background:var(--cobalt); border:none; color:#fff; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;}
+  .authcard button:disabled{opacity:.6; cursor:not-allowed;}
+  .authcard .err{font-size:12.5px; color:var(--bad); margin-top:10px; display:none;}
+  .authcard .err.show{display:block;}
+  .sync-status{font-size:10.5px; color:#7d92b8; margin-top:4px; display:flex; align-items:center; gap:5px;}
+  .sync-dot{width:6px; height:6px; border-radius:50%; background:#7d92b8; flex-shrink:0;}
+  .sync-dot.saved{background:#3ecf8e;}
+  .sync-dot.saving{background:#e0a83f;}
+  .sync-dot.error{background:#e06767;}
+
+  /* Print / PDF layout */
+  #printArea{display:none;}
+  .pdf-letterhead{margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid var(--navy);}
+  .pdf-letterhead .firm{font-size:18px; font-weight:800; color:var(--navy); letter-spacing:.02em;}
+  .pdf-letterhead .addr{font-size:11.5px; color:var(--ink-dim); margin-top:2px;}
+  .pdf-title{font-size:15px; font-weight:700; color:var(--navy); margin:18px 0 2px;}
+  .pdf-sub{font-size:11.5px; color:var(--ink-dim); margin-bottom:10px;}
+  .pdf-section{margin-top:16px;}
+  .pdf-section h3{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--navy); border-bottom:1px solid var(--line); padding-bottom:4px; margin:0 0 8px;}
+  .pdf-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:6px 18px; font-size:12px;}
+  .pdf-grid.two{grid-template-columns:repeat(2,1fr);}
+  .pdf-field{display:flex; flex-direction:column;}
+  .pdf-field .l{font-size:9.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-dim);}
+  .pdf-field .v{font-size:12px; color:var(--ink); border-bottom:1px solid #eee; padding:1px 0 3px; min-height:15px;}
+  .pdf-table{width:100%; border-collapse:collapse; font-size:11.5px; margin-top:6px;}
+  .pdf-table th{text-align:left; font-size:9.5px; text-transform:uppercase; color:var(--ink-dim); border-bottom:1px solid var(--line); padding:5px 6px;}
+  .pdf-table td{padding:5px 6px; border-bottom:1px solid #f0f0f0;}
+  .pdf-scores{display:flex; gap:30px; margin:10px 0;}
+  .pdf-scores .s{text-align:center;}
+  .pdf-scores .s .num{font-size:26px; font-weight:800; color:var(--navy);}
+  .pdf-scores .s .lbl{font-size:9.5px; text-transform:uppercase; color:var(--ink-dim);}
+  .pdf-sig-row{display:flex; gap:40px; margin-top:34px;}
+  .pdf-page-break{page-break-before:always;}
+  .pdf-sig{flex:1; border-top:1px solid #999; padding-top:5px; font-size:10.5px; color:var(--ink-dim);}
+  .pdf-notes{font-size:12px; white-space:pre-wrap; border:1px solid var(--line); border-radius:4px; padding:8px; min-height:30px;}
+
+  @media (max-width: 760px){
+    .shell{flex-direction:column;}
+    .sidebar{width:100%; flex-direction:row; flex-wrap:wrap; align-items:center; padding:14px 16px; gap:10px; position:static; height:auto; overflow-y:visible;}
+    .sidebar .brand{width:100%;}
+    .sidebar input, .sidebar select, .sidebar .btn{width:auto; flex:1; min-width:110px;}
+    .client-list{width:100%; max-height:140px; overflow-y:auto; order:5;}
+    .tool-switcher-label, .tool-switcher, .nav-divider, .side-foot{width:100%;}
+    .main{padding:18px 16px;}
+    .row{flex-direction:column;}
+    .tabs{flex-wrap:nowrap;}
+    table{font-size:12px;}
+  }
+
+  @media print{
+    body *{visibility:hidden;}
+    #printArea, #printArea *{visibility:visible;}
+    #printArea{display:block; position:absolute; left:0; top:0; width:100%; padding:20px;}
+    @page{margin:0.6in;}
+  }
+</style>
+</head>
+<body>
+<div class="authgate" id="authGate">
+  <div class="authcard">
+    <div class="auth-logo">REDMOUNT</div>
+    <h1>Financial Plan</h1>
+    <p class="sub">Sign in to access client data.</p>
+    <label>Email</label>
+    <input type="email" id="authEmail" autocomplete="username">
+    <label>Password</label>
+    <input type="password" id="authPassword" autocomplete="current-password">
+    <button id="authSubmit">Sign in</button>
+    <div class="err" id="authErr"></div>
+  </div>
+</div>
+<div id="mainApp" style="display:none;">
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">REDMOUNT<small>Financial Plan</small></div>
+    <button class="btn" onclick="addClient()">+ New Client</button>
+    <input type="text" placeholder="Search clients…" oninput="setClientSearch(this.value)"
+      style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:12.5px; padding:7px 9px; border-radius:6px;">
+    <select id="clientDropdown" onchange="if(this.value) selectClient(this.value);"
+      style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:12.5px; padding:7px 9px; border-radius:6px; font-family:inherit;">
+      <option value="">Jump to client…</option>
+    </select>
+    <div class="client-list" id="clientList"></div>
+    <div class="side-foot">
+      Signed in as <span id="authedEmail"></span> · <span class="signout-link" id="signOutBtn" style="cursor:pointer; text-decoration:underline;">Sign out</span>
+      <div class="sync-status" id="syncStatus"><span class="sync-dot" id="syncDot"></span><span id="syncText">Idle</span></div>
+      <div style="margin-top:6px; color:#5b7bab;">Client roster is shared with Risk Modeling — clients added here appear there too, and vice versa.</div>
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="tool-switcher-label">Switch Tool</div>
+    <select class="tool-switcher" id="toolSwitcher">
+      <option value="">— Redmount Tools —</option>
+      <option value="https://redmountcurtis.github.io/Redmount-Terminal/">Terminal (Home)</option>
+      <option value="https://redmountcurtis.github.io/401k/">Fiduciary Monitor</option>
+      <option value="https://redmountcurtis.github.io/capital-stack-navigator/">Capital Stack Navigator</option>
+      <option value="https://redmountcurtis.github.io/risk-modeling/">Risk Modeling</option>
+      <option value="https://redmountcurtis.github.io/financial-plan/" selected disabled>Financial Plan (current)</option>
+      <option value="https://redmountcurtis.github.io/enterprise-capital-strategy/">Enterprise Capital Strategy</option>
+    </select>
+  </aside>
+
+  <main class="main" id="mainArea">
+    <div class="empty" style="margin-top:60px;">Add a client to get started.</div>
+  </main>
+</div>
+</div>
+<div id="printArea"></div>
+
+<script>
+// ==================== AUTH + PERSISTENCE ====================
+const SUPABASE_URL = 'https://pdympbpyavilstjsmjtm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2CogNhXWXa7phJfFPpxVgg_JEevv89Y';
+const AUTH_URL = SUPABASE_URL + '/auth/v1';
+const REST_URL = SUPABASE_URL + '/rest/v1';
+const SESSION_KEY = 'redmount_session'; // shared across all Redmount tools for single sign-on
+
+function $id(id){ return document.getElementById(id); }
+
+async function authSignIn(email, password){
+  const res = await fetch(AUTH_URL+'/token?grant_type=password', {
+    method:'POST', headers:{'apikey':SUPABASE_KEY, 'Content-Type':'application/json'},
+    body: JSON.stringify({email, password})
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error_description || data.msg || 'Incorrect email or password');
+  return data;
+}
+async function authRefresh(refreshToken){
+  const res = await fetch(AUTH_URL+'/token?grant_type=refresh_token', {
+    method:'POST', headers:{'apikey':SUPABASE_KEY, 'Content-Type':'application/json'},
+    body: JSON.stringify({refresh_token:refreshToken})
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error('refresh failed');
+  return data;
+}
+function saveSession(data){
+  const session = {access_token:data.access_token, refresh_token:data.refresh_token,
+    expires_at: Date.now() + (data.expires_in||3600)*1000, email: data.user && data.user.email};
+  try{ localStorage.setItem(SESSION_KEY, JSON.stringify(session)); }catch(e){}
+  return session;
+}
+function loadStoredSession(){
+  try{ const raw = localStorage.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+}
+function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+async function ensureValidSession(){
+  const session = loadStoredSession();
+  if(!session) return null;
+  if(Date.now() < session.expires_at - 60000) return session;
+  try{ const fresh = saveSession(await authRefresh(session.refresh_token)); return fresh; }
+  catch(e){ clearSession(); return null; }
+}
+
+async function supabaseFetch(path, options){
+  options = options || {};
+  const session = await ensureValidSession();
+  if(!session) throw new Error('Not signed in');
+  const headers = Object.assign({
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + session.access_token,
+    'Content-Type': 'application/json'
+  }, options.headers || {});
+  const res = await fetch(REST_URL + path, Object.assign({}, options, {headers}));
+  if(!res.ok){
+    const text = await res.text().catch(()=> '');
+    throw new Error('Supabase error ' + res.status + ': ' + text);
+  }
+  return res;
+}
+
+function setSyncStatus(state, text){
+  const dot = $id('syncDot'), label = $id('syncText');
+  if(!dot) return;
+  dot.className = 'sync-dot' + (state ? ' '+state : '');
+  label.textContent = text || (state==='saved' ? 'Saved' : state==='saving' ? 'Saving…' : state==='error' ? 'Error saving' : 'Idle');
+}
+
+function uid(prefix){ return (prefix||'id') + '_' + Math.random().toString(36).slice(2,10); }
+function esc(v){ return (v===null||v===undefined||v==='') ? '<span style="color:#bbb;">—</span>' : String(v); }
+function num(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function fmt$(v, digits){ digits = digits===undefined?0:digits; return '$'+num(v).toLocaleString(undefined,{minimumFractionDigits:digits, maximumFractionDigits:digits}); }
+function fmtPct(v, digits){ digits = digits===undefined?1:digits; return num(v).toFixed(digits)+'%'; }
+
+// ---- Remote load: clients come from the SHARED risk_clients table; this tool's
+// own planning data lives in a separate financial_plans table keyed by client id. ----
+async function loadRemoteData(){
+  setSyncStatus('saving', 'Loading…');
+  try{
+    const [clientsRes, plansRes] = await Promise.all([
+      supabaseFetch('/risk_clients?select=id,payload,updated_at&order=updated_at.desc'),
+      supabaseFetch('/financial_plans?select=id,client_id,payload,updated_at')
+    ]);
+    const clientRows = await clientsRes.json();
+    const planRows = await plansRes.json();
+
+    sharedClients = clientRows.map(row => ({
+      id: row.id,
+      first: (row.payload && row.payload.client1 && row.payload.client1.first) || '',
+      last: (row.payload && row.payload.client1 && row.payload.client1.last) || '',
+      riskPayload: row.payload || {}
+    }));
+
+    plans = {};
+    planRemoteIds = {};
+    planRows.forEach(row => {
+      plans[row.client_id] = migratePlan(row.payload || {});
+      planRemoteIds[row.client_id] = row.id;
+      lastSavedHash[row.client_id] = JSON.stringify(plans[row.client_id]);
+    });
+    // Make sure every shared client has at least a blank in-memory plan, even if nothing saved yet.
+    sharedClients.forEach(sc => { if(!plans[sc.id]) plans[sc.id] = blankPlan(); });
+
+    activeId = sharedClients.length ? sharedClients[0].id : null;
+    setSyncStatus('saved', 'Synced');
+  }catch(e){
+    console.error(e);
+    setSyncStatus('error', 'Could not load — using local data');
+  }
+}
+
+// ---- Remote save (plan) ----
+async function savePlanRemote(clientId){
+  setSyncStatus('saving');
+  try{
+    const payload = plans[clientId];
+    if(!planRemoteIds[clientId]){
+      const res = await supabaseFetch('/financial_plans', {
+        method:'POST',
+        headers:{'Prefer':'return=representation'},
+        body: JSON.stringify({client_id: clientId, payload})
+      });
+      const data = await res.json();
+      if(data && data[0]) planRemoteIds[clientId] = data[0].id;
+    } else {
+      await supabaseFetch('/financial_plans?id=eq.'+planRemoteIds[clientId], {
+        method:'PATCH',
+        body: JSON.stringify({payload})
+      });
+    }
+    lastSavedHash[clientId] = JSON.stringify(payload);
+    setSyncStatus('saved');
+  }catch(e){ console.error(e); setSyncStatus('error'); }
+}
+
+async function forceSavePlan(clientId){
+  const btn = $id('manualSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+  try{
+    await savePlanRemote(clientId);
+    if(btn){ btn.textContent = 'Saved ✓'; setTimeout(()=>{ if($id('manualSaveBtn')){ $id('manualSaveBtn').textContent='Save'; $id('manualSaveBtn').disabled=false; } }, 1400); }
+  }catch(e){
+    console.error(e);
+    if(btn){ btn.textContent = 'Save failed — retry'; btn.disabled = false; }
+  }
+}
+
+// New clients are written to the SHARED risk_clients table (so Risk Modeling sees
+// them too), with a minimal payload matching that tool's schema.
+async function createSharedClient(first, last){
+  const minimalRiskPayload = {
+    client1: {last:last||'', first:first||'', mi:'', status:'', employer:'', occupation:'', startDate:'', salary:''},
+    client2: {last:'', first:'', mi:'', status:'', employer:'', occupation:'', startDate:'', salary:''},
+    contact: {address:'', cityStateZip:'', phone:'', cell:'', email:''},
+    professionals: {cpa:'', attorney:'', other:''},
+    beneficiaries: [], age:'',
+    financial: {taxBracket:'', netWorth:'', liquidNetWorth:'', annualIncome:'', annualExpense:'', totalAssets:'', investableAssets:''},
+    household: {size:'', dependentsUnder18:'', healthStatus:'', incomeSector:'', ownsPropertyInZip:''},
+    questionnaire: {lossReaction:'', historicalBehavior:'', maxLossTolerance:'', gainFlipChoice:'', lossFlipChoice:'', incomeStability:'', experienceLevel:''},
+    goal: {description:'', targetAmount:'', years:'', annualContribution:''},
+    riskTolerance:'', objective:'', horizon:'', liquidityImportance:'', drawingFromHoldings:'no',
+    otherIncomeSources: [], otherIncomeOther:'', issuesForDiscussion: [], issuesOther:'',
+    recommendations:'', notes:'', accounts: [],
+    proposedScenarios: [{id: uid('sc'), name:'Scenario 1', holdings: []}],
+    activeScenarioId: null, reviewHistory: []
+  };
+  minimalRiskPayload.activeScenarioId = minimalRiskPayload.proposedScenarios[0].id;
+  const res = await supabaseFetch('/risk_clients', {
+    method:'POST',
+    headers:{'Prefer':'return=representation'},
+    body: JSON.stringify({payload: minimalRiskPayload})
+  });
+  const data = await res.json();
+  return data && data[0] ? data[0] : null;
+}
+
+// ---- Autosave loop: diff current plan state against last-saved snapshot every few seconds ----
+let lastSavedHash = {};
+function autosaveTick(){
+  Object.keys(plans).forEach(cid=>{
+    const json = JSON.stringify(plans[cid]);
+    if(lastSavedHash[cid] !== json){
+      lastSavedHash[cid] = json; // set immediately to avoid duplicate concurrent saves
+      savePlanRemote(cid);
+    }
+  });
+}
+setInterval(autosaveTick, 4000);
+window.addEventListener('beforeunload', autosaveTick);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) autosaveTick(); });
+
+function enterApp(){
+  $id('authGate').style.display = 'none';
+  $id('mainApp').style.display = 'block';
+}
+
+$id('authSubmit') && $id('authSubmit').addEventListener('click', async function(){
+  const email = $id('authEmail').value.trim();
+  const password = $id('authPassword').value;
+  if(!email || !password){ showAuthErr('Enter an email and password.'); return; }
+  $id('authSubmit').disabled = true;
+  try{
+    const data = await authSignIn(email, password);
+    saveSession(data);
+    $id('authedEmail').textContent = data.user.email;
+    enterApp();
+    await loadRemoteData();
+    renderAll();
+  }catch(e){ showAuthErr(e.message || 'Incorrect email or password'); }
+  $id('authSubmit').disabled = false;
+});
+function showAuthErr(msg){ const el = $id('authErr'); el.textContent = msg; el.classList.add('show'); }
+
+document.addEventListener('DOMContentLoaded', function(){
+  const signOutBtn = $id('signOutBtn');
+  if(signOutBtn) signOutBtn.addEventListener('click', function(){
+    autosaveTick();
+    clearSession();
+    $id('mainApp').style.display = 'none';
+    $id('authGate').style.display = 'flex';
+    $id('authEmail').value=''; $id('authPassword').value='';
+    sharedClients = []; plans = {}; activeId = null; lastSavedHash = {};
+  });
+});
+
+async function tryAutoLogin(){
+  const session = await ensureValidSession();
+  if(!session) return;
+  $id('authedEmail').textContent = session.email || '';
+  enterApp();
+  await loadRemoteData();
+  renderAll();
+}
+
+// ==================== DATA MODEL ====================
+let sharedClients = [];   // from risk_clients — the shared roster
+let plans = {};           // clientId -> plan payload (this tool's own data)
+let planRemoteIds = {};   // clientId -> financial_plans.id
+let activeId = null;
+let activeTab = 'household';
+let clientSearchQuery = '';
+let whatIf = { retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0 }; // reset per client view
+
+function blankPlan(){
+  return {
+    household: {
+      client1: {first:'', last:'', dob:'', retireAge:65, lifeExpectancy:92},
+      client2: {first:'', last:'', dob:'', retireAge:65, lifeExpectancy:92},
+      hasClient2:false, filingStatus:'', dependents:0
+    },
+    netWorth: {
+      assets: [],      // {id,name,category,value}
+      liabilities: []  // {id,name,category,balance,rate}
+    },
+    cashFlow: {
+      income: [],      // {id,name,amount,freq:'annual'|'monthly',owner:'client1'|'client2'|'joint'}
+      expenses: []      // {id,name,amount,freq:'annual'|'monthly',essential:bool}
+    },
+    goals: [], // {id,name,type,priority:'need'|'want'|'wish',targetYear,amountToday,fundedFromPortfolio:bool}
+    assumptions: {
+      inflationRate:2.8, preRetirementReturn:7.0, postRetirementReturn:5.0, returnVol:11.0,
+      desiredRetirementSpending:'', currentPortfolioOverride:''
+    },
+    socialSecurity: {
+      pia1:'', fra1:67, pia2:'', fra2:67, claimAge1:67, claimAge2:67
+    },
+    pensions: [], // {id,owner,monthlyAmount,startAge}
+    insurance: {
+      life1: {incomeReplaceYears:10, existingCoverage:'', finalExpenses:15000, debtPayoff:'', eduFundGoal:''},
+      life2: {incomeReplaceYears:10, existingCoverage:'', finalExpenses:15000, debtPayoff:'', eduFundGoal:''},
+      disability1: {monthlyExpenses:'', existingBenefit:''},
+      disability2: {monthlyExpenses:'', existingBenefit:''}
+    },
+    education: [], // {id,name,currentAge,collegeAge,yearsInCollege,currentCostPerYear,inflationRate,currentSavings,monthlyContribution}
+    monteCarlo: { trials:500 },
+    notes: ''
+  };
+}
+
+function migratePlan(p){
+  const b = blankPlan();
+  function merge(target, src){
+    Object.keys(target).forEach(k=>{
+      if(src && src[k]!==undefined){
+        if(Array.isArray(target[k])){ target[k] = Array.isArray(src[k]) ? src[k] : target[k]; }
+        else if(typeof target[k]==='object' && target[k]!==null){ merge(target[k], src[k]); }
+        else{ target[k] = src[k]; }
+      }
+    });
+  }
+  merge(b, p);
+  return b;
+}
+
+function getSharedClient(id){ return sharedClients.find(c=>c.id===id); }
+function getPlan(id){ return plans[id]; }
+function clientName(sc){ return (sc.first || sc.last) ? `${sc.first} ${sc.last}`.trim() : 'New client'; }
+
+async function addClient(){
+  const first = prompt('Client first name?');
+  if(first===null) return;
+  const last = prompt('Client last name?') || '';
+  try{
+    const row = await createSharedClient(first.trim(), last.trim());
+    if(row){
+      sharedClients.unshift({id:row.id, first:first.trim(), last:last.trim(), riskPayload: row.payload || {}});
+      plans[row.id] = blankPlan();
+      plans[row.id].household.client1.first = first.trim();
+      plans[row.id].household.client1.last = last.trim();
+      activeId = row.id;
+      activeTab = 'household';
+      renderAll();
+      forceSavePlan(row.id);
+    }
+  }catch(e){ console.error(e); alert('Could not create client: ' + e.message); }
+}
+
+function setClientSearch(q){ clientSearchQuery = q; renderClientList(); }
+function selectClient(id){ activeId = id; activeTab = 'household'; whatIf = {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}; renderAll(); }
+function setTab(t){ activeTab = t; renderMain(); }
+
+function renderClientList(){
+  const wrap = $id('clientList');
+  if(!wrap) return;
+  const q = (clientSearchQuery||'').trim().toLowerCase();
+  const filtered = q ? sharedClients.filter(sc => clientName(sc).toLowerCase().includes(q)) : sharedClients;
+
+  const dd = $id('clientDropdown');
+  if(dd){
+    const sorted = [...sharedClients].sort((a,b)=>clientName(a).localeCompare(clientName(b)));
+    dd.innerHTML = `<option value="">Jump to client…</option>` + sorted.map(sc=>
+      `<option value="${sc.id}" ${sc.id===activeId?'selected':''}>${clientName(sc)}</option>`).join('');
+  }
+
+  if(sharedClients.length===0){ wrap.innerHTML = ''; return; }
+  if(filtered.length===0){ wrap.innerHTML = '<div style="font-size:11.5px; color:#7d92b8; padding:6px 10px;">No matches.</div>'; return; }
+  wrap.innerHTML = filtered.map(sc=>{
+    const plan = getPlan(sc.id);
+    const pos = plan ? monteCarloResult(plan, whatIf, 120).successRate : null;
+    let dotColor = '#5b6b82';
+    if(pos!==null){ dotColor = pos>=80 ? '#3ecf8e' : pos>=60 ? '#e0a83f' : '#e06767'; }
+    return `<div class="client-item ${sc.id===activeId?'active':''}" onclick="selectClient('${sc.id}')">
+      <span>${clientName(sc)}</span><span class="gapdot" style="background:${dotColor}"></span>
+    </div>`;
+  }).join('');
+}
+
+function renderAll(){ renderClientList(); renderMain(); }
+
+// ==================== CALCULATION ENGINES ====================
+
+// ---- Net worth ----
+const ASSET_CATEGORIES = ['Investment','Retirement','Cash','Real Estate','Business','Other'];
+const LIABILITY_CATEGORIES = ['Mortgage','Auto Loan','Student Loan','Credit Card','Other'];
+
+function netWorthTotals(plan){
+  const assets = plan.netWorth.assets.reduce((s,a)=>s+num(a.value),0);
+  const liabilities = plan.netWorth.liabilities.reduce((s,l)=>s+num(l.balance),0);
+  return { assets, liabilities, net: assets - liabilities };
+}
+function investablePortfolioValue(plan){
+  if(plan.assumptions.currentPortfolioOverride!=='' && plan.assumptions.currentPortfolioOverride!==null && plan.assumptions.currentPortfolioOverride!==undefined){
+    return num(plan.assumptions.currentPortfolioOverride);
+  }
+  return plan.netWorth.assets.filter(a=>a.category==='Investment'||a.category==='Retirement').reduce((s,a)=>s+num(a.value),0);
+}
+
+// ---- Cash flow ----
+function annualize(amount, freq){ return freq==='monthly' ? num(amount)*12 : num(amount); }
+function cashFlowTotals(plan){
+  const income = plan.cashFlow.income.reduce((s,i)=>s+annualize(i.amount,i.freq),0);
+  const expenses = plan.cashFlow.expenses.reduce((s,e)=>s+annualize(e.amount,e.freq),0);
+  return { income, expenses, net: income - expenses };
+}
+
+// ---- Ages / timeline ----
+function ageFromDOB(dob){
+  if(!dob) return null;
+  const d = new Date(dob);
+  if(isNaN(d.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if(m < 0 || (m===0 && now.getDate() < d.getDate())) age--;
+  return age;
+}
+function currentAge1(plan){ return ageFromDOB(plan.household.client1.dob) || 0; }
+function currentAge2(plan){ return plan.household.hasClient2 ? (ageFromDOB(plan.household.client2.dob) || 0) : null; }
+
+// ---- Social Security ----
+function ssBenefitAtAge(pia, fra, claimAge){
+  pia = num(pia); fra = num(fra)||67; claimAge = num(claimAge);
+  if(!pia) return 0;
+  const monthsFromFRA = Math.round((claimAge - fra) * 12);
+  if(monthsFromFRA === 0) return pia;
+  if(monthsFromFRA < 0){
+    const monthsEarly = Math.min(-monthsFromFRA, (fra-62)*12);
+    const first36 = Math.min(36, monthsEarly);
+    const beyond36 = Math.max(0, monthsEarly-36);
+    const reduction = first36*(5/9/100) + beyond36*(5/12/100);
+    return pia*(1-reduction);
+  } else {
+    const monthsLate = Math.min(monthsFromFRA, (70-fra)*12);
+    const increase = monthsLate*(2/3/100);
+    return pia*(1+increase);
+  }
+}
+function ssComparisonTable(pia, fra){
+  const ages = [62,63,64,65,66,67,68,69,70].filter(a=>a>=62 && a<=70);
+  return ages.map(a=>({age:a, monthly: ssBenefitAtAge(pia,fra,a), annual: ssBenefitAtAge(pia,fra,a)*12}));
+}
+function ssBreakevenAge(pia, fra, earlyAge, lateAge){
+  const earlyMonthly = ssBenefitAtAge(pia,fra,earlyAge);
+  const lateMonthly = ssBenefitAtAge(pia,fra,lateAge);
+  if(lateMonthly<=earlyMonthly) return null;
+  // Cumulative dollars: find age where late-claim cumulative catches up to early-claim cumulative.
+  let earlyCum = 0, lateCum = 0;
+  for(let age=earlyAge; age<=100; age += (1/12)){
+    earlyCum += earlyMonthly;
+    lateCum += (age>=lateAge) ? lateMonthly : 0;
+    if(lateCum >= earlyCum && age > lateAge) return Math.round(age*10)/10;
+  }
+  return null;
+}
+
+// ---- Monte Carlo retirement projection ----
+// Simplified single-portfolio model: pre-retirement contributions grow the portfolio;
+// post-retirement, spending (net of guaranteed income) is withdrawn; goals with
+// fundedFromPortfolio=true subtract a lump sum in their target year. Returns are drawn
+// from a lognormal distribution per trial-year using the assumption set. This is an
+// illustrative planning tool, not a full tax- and sequence-aware retirement engine.
+function boxMullerNormal(){
+  let u=0, v=0;
+  while(u===0) u = Math.random();
+  while(v===0) v = Math.random();
+  return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+}
+
+function monteCarloResult(plan, wi, trialsOverride){
+  wi = wi || {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0};
+  const a1 = currentAge1(plan);
+  const life1 = num(plan.household.client1.lifeExpectancy) || 92;
+  const retireAge1 = (num(plan.household.client1.retireAge) || 65) + num(wi.retireAgeDelta);
+  const yearsToRetire = Math.max(0, retireAge1 - a1);
+  const yearsInRetirement = Math.max(0, life1 - retireAge1);
+  const totalYears = yearsToRetire + yearsInRetirement;
+  if(totalYears<=0 || a1<=0) return {successRate:null, medianEndingBalance:null, yearsToRetire, yearsInRetirement, trials:0};
+
+  const startingPortfolio = investablePortfolioValue(plan);
+  const cf = cashFlowTotals(plan);
+  const annualSavings = Math.max(0, cf.net) * (num(wi.savingsPct)/100);
+  const desiredSpend = plan.assumptions.desiredRetirementSpending!=='' && plan.assumptions.desiredRetirementSpending!==null
+    ? num(plan.assumptions.desiredRetirementSpending)
+    : Math.max(0, cf.expenses);
+  const retirementSpend = desiredSpend * (num(wi.spendingPct)/100);
+
+  const inflation = num(plan.assumptions.inflationRate)/100;
+  const muPre = num(plan.assumptions.preRetirementReturn)/100 + num(wi.returnDelta)/100;
+  const muPost = num(plan.assumptions.postRetirementReturn)/100 + num(wi.returnDelta)/100;
+  const sigma = num(plan.assumptions.returnVol)/100;
+
+  const guaranteedAnnual = () => {
+    let g = 0;
+    if(plan.socialSecurity.pia1) g += ssBenefitAtAge(plan.socialSecurity.pia1, plan.socialSecurity.fra1, plan.socialSecurity.claimAge1) * 12;
+    if(plan.household.hasClient2 && plan.socialSecurity.pia2) g += ssBenefitAtAge(plan.socialSecurity.pia2, plan.socialSecurity.fra2, plan.socialSecurity.claimAge2) * 12;
+    (plan.pensions||[]).forEach(p=>{ g += num(p.monthlyAmount)*12; });
+    return g;
+  };
+  const guaranteed = guaranteedAnnual();
+
+  const lumpGoalsByYear = {};
+  (plan.goals||[]).forEach(goal=>{
+    if(!goal.fundedFromPortfolio) return;
+    const yearsOut = num(goal.targetYear) - new Date().getFullYear();
+    if(yearsOut>=0 && yearsOut<=totalYears){
+      lumpGoalsByYear[yearsOut] = (lumpGoalsByYear[yearsOut]||0) + num(goal.amountToday) * Math.pow(1+inflation, yearsOut);
+    }
+  });
+
+  const N = trialsOverride || (plan.monteCarlo && plan.monteCarlo.trials) || 500;
+  let successes = 0;
+  const endingBalances = [];
+  for(let t=0; t<N; t++){
+    let bal = startingPortfolio;
+    let failed = false;
+    let spend = retirementSpend;
+    let save = annualSavings;
+    for(let y=0; y<totalYears; y++){
+      const inRetirement = y >= yearsToRetire;
+      const mu = inRetirement ? muPost : muPre;
+      const r = mu + sigma * boxMullerNormal();
+      bal *= (1+r);
+      if(inRetirement){
+        const need = Math.max(0, spend - guaranteed);
+        bal -= need;
+      } else {
+        bal += save;
+      }
+      if(lumpGoalsByYear[y]) bal -= lumpGoalsByYear[y];
+      if(bal < 0){ bal = 0; failed = true; }
+      spend *= (1+inflation);
+      save *= (1+inflation);
+    }
+    if(!failed) successes++;
+    endingBalances.push(bal);
+  }
+  endingBalances.sort((x,y)=>x-y);
+  const median = endingBalances.length ? endingBalances[Math.floor(endingBalances.length/2)] : 0;
+  return {
+    successRate: Math.round((successes/N)*1000)/10,
+    medianEndingBalance: median,
+    yearsToRetire, yearsInRetirement, trials:N,
+    retirementSpend, guaranteed, annualSavings, startingPortfolio
+  };
+}
+
+// ---- Insurance needs (simplified DIME-style life insurance; income-replacement disability) ----
+function lifeInsuranceNeed(plan, ownerKey){
+  const ins = plan.insurance[ownerKey];
+  if(!ins) return null;
+  const cf = cashFlowTotals(plan);
+  const owner = ownerKey==='life1' ? plan.household.client1 : plan.household.client2;
+  const ownerIncome = plan.cashFlow.income.filter(i=> (ownerKey==='life1' ? i.owner==='client1' : i.owner==='client2') || i.owner==='joint')
+    .reduce((s,i)=>s+annualize(i.amount,i.freq),0);
+  const incomeReplacement = ownerIncome * num(ins.incomeReplaceYears);
+  const nw = netWorthTotals(plan);
+  const gross = incomeReplacement + num(ins.debtPayoff) + num(ins.finalExpenses) + num(ins.eduFundGoal);
+  const offsets = num(ins.existingCoverage) + Math.max(0, nw.assets - nw.liabilities) * 0; // liquid net worth offset intentionally left to advisor judgment
+  const need = Math.max(0, gross - num(ins.existingCoverage));
+  return { ownerIncome, incomeReplacement, gross, existingCoverage: num(ins.existingCoverage), need };
+}
+function disabilityGap(plan, ownerKey){
+  const d = plan.insurance[ownerKey];
+  if(!d) return null;
+  const monthlyExpenses = num(d.monthlyExpenses);
+  const existingBenefit = num(d.existingBenefit);
+  return { monthlyExpenses, existingBenefit, gap: Math.max(0, monthlyExpenses-existingBenefit) };
+}
+
+// ---- Education funding ----
+function educationProjection(goal){
+  const yearsUntilCollege = Math.max(0, num(goal.collegeAge) - num(goal.currentAge));
+  const inflation = num(goal.inflationRate)/100 || 0.05;
+  const yearsInCollege = num(goal.yearsInCollege) || 4;
+  const costPerYearToday = num(goal.currentCostPerYear);
+  let futureTotalCost = 0;
+  for(let y=0; y<yearsInCollege; y++){
+    futureTotalCost += costPerYearToday * Math.pow(1+inflation, yearsUntilCollege+y);
+  }
+  const growthRate = 0.06; // assumed 529-style growth rate for savings, separate from cost inflation
+  const currentSavings = num(goal.currentSavings);
+  const futureValueOfCurrentSavings = currentSavings * Math.pow(1+growthRate, yearsUntilCollege);
+  const gap = Math.max(0, futureTotalCost - futureValueOfCurrentSavings);
+  // Required monthly savings (ordinary annuity, monthly compounding) to close the gap by yearsUntilCollege.
+  const months = yearsUntilCollege*12;
+  const mRate = growthRate/12;
+  let requiredMonthly = 0;
+  if(months>0){
+    requiredMonthly = mRate>0 ? gap * mRate / (Math.pow(1+mRate,months)-1) : gap/months;
+  } else {
+    requiredMonthly = gap;
+  }
+  return { yearsUntilCollege, yearsInCollege, futureTotalCost, futureValueOfCurrentSavings, gap, requiredMonthly, currentMonthlyContribution: num(goal.monthlyContribution) };
+}
+
+// ==================== RENDER: MAIN SHELL ====================
+function renderMain(){
+  const main = $id('mainArea');
+  if(!activeId){ main.innerHTML = '<div class="empty" style="margin-top:60px;">Add a client to get started.</div>'; return; }
+  const sc = getSharedClient(activeId);
+  const plan = getPlan(activeId);
+  if(!sc || !plan){ main.innerHTML = '<div class="empty" style="margin-top:60px;">Add a client to get started.</div>'; return; }
+  const name = clientName(sc);
+
+  main.innerHTML = `
+    <div class="toolbar">
+      <div>
+        <h1 style="margin-bottom:2px;">${name}</h1>
+        <p class="sub" style="margin:0;">Full financial plan — goals, net worth, cash flow, and probability of success</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="btn secondary" id="manualSaveBtn" onclick="forceSavePlan('${activeId}')">Save</button>
+        <button class="btn" onclick="downloadPlanPDF('${activeId}')">Download PDF</button>
+      </div>
+    </div>
+    <div class="tabs">
+      <div class="tab ${activeTab==='household'?'active':''}" onclick="setTab('household')">Household</div>
+      <div class="tab ${activeTab==='networth'?'active':''}" onclick="setTab('networth')">Net Worth</div>
+      <div class="tab ${activeTab==='cashflow'?'active':''}" onclick="setTab('cashflow')">Cash Flow</div>
+      <div class="tab ${activeTab==='goals'?'active':''}" onclick="setTab('goals')">Goals</div>
+      <div class="tab ${activeTab==='montecarlo'?'active':''}" onclick="setTab('montecarlo')">Probability of Success</div>
+      <div class="tab ${activeTab==='whatif'?'active':''}" onclick="setTab('whatif')">What-If</div>
+      <div class="tab ${activeTab==='socsec'?'active':''}" onclick="setTab('socsec')">Social Security</div>
+      <div class="tab ${activeTab==='insurance'?'active':''}" onclick="setTab('insurance')">Insurance Needs</div>
+      <div class="tab ${activeTab==='education'?'active':''}" onclick="setTab('education')">Education Funding</div>
+    </div>
+    <div id="tabContent"></div>
+    <footer class="tool-foot">Redmount Capital Partners — internal use</footer>
+  `;
+  renderTab();
+}
+
+function renderTab(){
+  const plan = getPlan(activeId);
+  const wrap = $id('tabContent');
+  if(activeTab==='household') wrap.innerHTML = householdTabHTML(plan);
+  else if(activeTab==='networth') wrap.innerHTML = netWorthTabHTML(plan);
+  else if(activeTab==='cashflow') wrap.innerHTML = cashFlowTabHTML(plan);
+  else if(activeTab==='goals') wrap.innerHTML = goalsTabHTML(plan);
+  else if(activeTab==='montecarlo') wrap.innerHTML = monteCarloTabHTML(plan);
+  else if(activeTab==='whatif') wrap.innerHTML = whatIfTabHTML(plan);
+  else if(activeTab==='socsec') wrap.innerHTML = socSecTabHTML(plan);
+  else if(activeTab==='insurance') wrap.innerHTML = insuranceTabHTML(plan);
+  else if(activeTab==='education') wrap.innerHTML = educationTabHTML(plan);
+}
+
+function markDirty(){ /* the autosave loop diffs plans[] every 4s; nothing else needed here */ }
+function update(path, val){
+  const plan = getPlan(activeId);
+  const parts = path.split('.');
+  let obj = plan;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  obj[parts[parts.length-1]] = val;
+  markDirty();
+}
+
+// ==================== TAB: HOUSEHOLD ====================
+function householdTabHTML(plan){
+  const h = plan.household;
+  return `
+  <div class="panel">
+    <h2>Client 1</h2>
+    <div class="row">
+      <div class="field"><label>First name</label><input value="${h.client1.first||''}" onchange="update('household.client1.first', this.value); renderClientList();"></div>
+      <div class="field"><label>Last name</label><input value="${h.client1.last||''}" onchange="update('household.client1.last', this.value); renderClientList();"></div>
+      <div class="field"><label>Date of birth</label><input type="date" value="${h.client1.dob||''}" onchange="update('household.client1.dob', this.value); renderTab();"></div>
+      <div class="field"><label>Planned retirement age</label><input type="number" value="${h.client1.retireAge}" onchange="update('household.client1.retireAge', this.value)"></div>
+      <div class="field"><label>Life expectancy (planning age)</label><input type="number" value="${h.client1.lifeExpectancy}" onchange="update('household.client1.lifeExpectancy', this.value)"></div>
+    </div>
+    <div style="font-size:12.5px; color:var(--ink-dim);">Current age: ${currentAge1(plan) || '—'}</div>
+  </div>
+
+  <div class="panel">
+    <h2>Client 2 (spouse/partner)</h2>
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:14px;">
+      <input type="checkbox" ${h.hasClient2?'checked':''} onchange="update('household.hasClient2', this.checked); renderTab();"> This plan includes a second household member
+    </label>
+    ${h.hasClient2 ? `
+    <div class="row">
+      <div class="field"><label>First name</label><input value="${h.client2.first||''}" onchange="update('household.client2.first', this.value)"></div>
+      <div class="field"><label>Last name</label><input value="${h.client2.last||''}" onchange="update('household.client2.last', this.value)"></div>
+      <div class="field"><label>Date of birth</label><input type="date" value="${h.client2.dob||''}" onchange="update('household.client2.dob', this.value); renderTab();"></div>
+      <div class="field"><label>Planned retirement age</label><input type="number" value="${h.client2.retireAge}" onchange="update('household.client2.retireAge', this.value)"></div>
+      <div class="field"><label>Life expectancy (planning age)</label><input type="number" value="${h.client2.lifeExpectancy}" onchange="update('household.client2.lifeExpectancy', this.value)"></div>
+    </div>
+    <div style="font-size:12.5px; color:var(--ink-dim);">Current age: ${currentAge2(plan) ?? '—'}</div>` : ''}
+  </div>
+
+  <div class="panel">
+    <h2>Household</h2>
+    <div class="row">
+      <div class="field"><label>Filing status</label>
+        <select onchange="update('household.filingStatus', this.value)">
+          <option value="">—</option>
+          ${['Single','Married Filing Jointly','Married Filing Separately','Head of Household'].map(o=>`<option value="${o}" ${h.filingStatus===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Dependents</label><input type="number" value="${h.dependents||0}" onchange="update('household.dependents', this.value)"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Plan Notes</h2>
+    <textarea rows="4" onchange="update('notes', this.value)">${plan.notes||''}</textarea>
+  </div>
+  `;
+}
+
+// ==================== TAB: NET WORTH ====================
+function addAsset(){
+  const plan = getPlan(activeId);
+  plan.netWorth.assets.push({id:uid('a'), name:'', category:'Investment', value:''});
+  renderTab();
+}
+function removeAsset(idx){ const plan=getPlan(activeId); plan.netWorth.assets.splice(idx,1); renderTab(); }
+function updateAsset(idx, field, val){ const plan=getPlan(activeId); plan.netWorth.assets[idx][field]=val; if(field!=='name') renderTab(); }
+function addLiability(){
+  const plan = getPlan(activeId);
+  plan.netWorth.liabilities.push({id:uid('l'), name:'', category:'Mortgage', balance:'', rate:''});
+  renderTab();
+}
+function removeLiability(idx){ const plan=getPlan(activeId); plan.netWorth.liabilities.splice(idx,1); renderTab(); }
+function updateLiability(idx, field, val){ const plan=getPlan(activeId); plan.netWorth.liabilities[idx][field]=val; if(field!=='name') renderTab(); }
+
+function netWorthTabHTML(plan){
+  const t = netWorthTotals(plan);
+  const assetRows = plan.netWorth.assets.map((a,i)=>`
+    <tr>
+      <td><input class="compact" value="${a.name||''}" placeholder="e.g. Schwab Brokerage" onchange="updateAsset(${i},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateAsset(${i},'category',this.value)">${ASSET_CATEGORIES.map(c=>`<option value="${c}" ${a.category===c?'selected':''}>${c}</option>`).join('')}</select></td>
+      <td><input class="compact" type="number" value="${a.value}" onchange="updateAsset(${i},'value',this.value)"></td>
+      <td><button class="removeX" onclick="removeAsset(${i})">✕</button></td>
+    </tr>`).join('');
+  const liabRows = plan.netWorth.liabilities.map((l,i)=>`
+    <tr>
+      <td><input class="compact" value="${l.name||''}" placeholder="e.g. Primary mortgage" onchange="updateLiability(${i},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateLiability(${i},'category',this.value)">${LIABILITY_CATEGORIES.map(c=>`<option value="${c}" ${l.category===c?'selected':''}>${c}</option>`).join('')}</select></td>
+      <td><input class="compact" type="number" value="${l.balance}" onchange="updateLiability(${i},'balance',this.value)"></td>
+      <td><input class="compact" type="number" value="${l.rate}" placeholder="Rate %" style="max-width:90px;" onchange="updateLiability(${i},'rate',this.value)"></td>
+      <td><button class="removeX" onclick="removeLiability(${i})">✕</button></td>
+    </tr>`).join('');
+
+  return `
+  <div class="summary-cards">
+    <div class="scard good"><div class="label">Total Assets</div><div class="value">${fmt$(t.assets)}</div></div>
+    <div class="scard bad"><div class="label">Total Liabilities</div><div class="value">${fmt$(t.liabilities)}</div></div>
+    <div class="scard"><div class="label">Net Worth</div><div class="value">${fmt$(t.net)}</div></div>
+    <div class="scard"><div class="label">Investable Portfolio</div><div class="value">${fmt$(investablePortfolioValue(plan))}</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Assets</h2>
+    <p class="desc">"Investment" and "Retirement" categories feed the investable portfolio used in the Monte Carlo projection — or override that figure directly below.</p>
+    <table>
+      <thead><tr><th>Name</th><th>Category</th><th>Value</th><th></th></tr></thead>
+      <tbody>${assetRows || '<tr><td colspan="4" style="color:#bbb;">No assets yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addAsset()">+ Add asset</button>
+    <div class="divider"></div>
+    <div class="field" style="max-width:280px;">
+      <label>Override investable portfolio value (optional)</label>
+      <input type="number" value="${plan.assumptions.currentPortfolioOverride}" placeholder="Leave blank to use Investment + Retirement assets above" onchange="update('assumptions.currentPortfolioOverride', this.value)">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Liabilities</h2>
+    <table>
+      <thead><tr><th>Name</th><th>Category</th><th>Balance</th><th>Rate</th><th></th></tr></thead>
+      <tbody>${liabRows || '<tr><td colspan="5" style="color:#bbb;">No liabilities yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addLiability()">+ Add liability</button>
+  </div>
+  `;
+}
+
+// ==================== TAB: CASH FLOW ====================
+function addIncome(){ const plan=getPlan(activeId); plan.cashFlow.income.push({id:uid('inc'), name:'', amount:'', freq:'annual', owner:'joint'}); renderTab(); }
+function removeIncome(idx){ const plan=getPlan(activeId); plan.cashFlow.income.splice(idx,1); renderTab(); }
+function updateIncome(idx, field, val){ const plan=getPlan(activeId); plan.cashFlow.income[idx][field]=val; if(field!=='name') renderTab(); }
+function addExpense(){ const plan=getPlan(activeId); plan.cashFlow.expenses.push({id:uid('exp'), name:'', amount:'', freq:'annual', essential:true}); renderTab(); }
+function removeExpense(idx){ const plan=getPlan(activeId); plan.cashFlow.expenses.splice(idx,1); renderTab(); }
+function updateExpense(idx, field, val){ const plan=getPlan(activeId); plan.cashFlow.expenses[idx][field]=val; if(field!=='name') renderTab(); }
+
+function cashFlowTabHTML(plan){
+  const t = cashFlowTotals(plan);
+  const incRows = plan.cashFlow.income.map((i,idx)=>`
+    <tr>
+      <td><input class="compact" value="${i.name||''}" placeholder="e.g. Salary" onchange="updateIncome(${idx},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateIncome(${idx},'owner',this.value)">
+        <option value="joint" ${i.owner==='joint'?'selected':''}>Joint</option>
+        <option value="client1" ${i.owner==='client1'?'selected':''}>Client 1</option>
+        <option value="client2" ${i.owner==='client2'?'selected':''}>Client 2</option>
+      </select></td>
+      <td><input class="compact" type="number" value="${i.amount}" onchange="updateIncome(${idx},'amount',this.value)"></td>
+      <td><select class="compact" onchange="updateIncome(${idx},'freq',this.value)">
+        <option value="annual" ${i.freq==='annual'?'selected':''}>Annual</option>
+        <option value="monthly" ${i.freq==='monthly'?'selected':''}>Monthly</option>
+      </select></td>
+      <td><button class="removeX" onclick="removeIncome(${idx})">✕</button></td>
+    </tr>`).join('');
+  const expRows = plan.cashFlow.expenses.map((e,idx)=>`
+    <tr>
+      <td><input class="compact" value="${e.name||''}" placeholder="e.g. Mortgage payment" onchange="updateExpense(${idx},'name',this.value)"></td>
+      <td><input class="compact" type="number" value="${e.amount}" onchange="updateExpense(${idx},'amount',this.value)"></td>
+      <td><select class="compact" onchange="updateExpense(${idx},'freq',this.value)">
+        <option value="annual" ${e.freq==='annual'?'selected':''}>Annual</option>
+        <option value="monthly" ${e.freq==='monthly'?'selected':''}>Monthly</option>
+      </select></td>
+      <td style="text-align:center;"><input type="checkbox" ${e.essential?'checked':''} onchange="updateExpense(${idx},'essential',this.checked)"></td>
+      <td><button class="removeX" onclick="removeExpense(${idx})">✕</button></td>
+    </tr>`).join('');
+
+  return `
+  <div class="summary-cards">
+    <div class="scard good"><div class="label">Total Income</div><div class="value">${fmt$(t.income)}</div></div>
+    <div class="scard bad"><div class="label">Total Expenses</div><div class="value">${fmt$(t.expenses)}</div></div>
+    <div class="scard ${t.net>=0?'good':'bad'}"><div class="label">Net Cash Flow</div><div class="value">${fmt$(t.net)}</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Income</h2>
+    <table>
+      <thead><tr><th>Source</th><th>Owner</th><th>Amount</th><th>Frequency</th><th></th></tr></thead>
+      <tbody>${incRows || '<tr><td colspan="5" style="color:#bbb;">No income sources yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addIncome()">+ Add income source</button>
+  </div>
+
+  <div class="panel">
+    <h2>Expenses</h2>
+    <p class="desc">Marking an expense "essential" doesn't change the math here — it's a flag for the What-If tab conversation about what's actually cuttable if spending needs to come down.</p>
+    <table>
+      <thead><tr><th>Expense</th><th>Amount</th><th>Frequency</th><th>Essential</th><th></th></tr></thead>
+      <tbody>${expRows || '<tr><td colspan="5" style="color:#bbb;">No expenses yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addExpense()">+ Add expense</button>
+  </div>
+  `;
+}
+
+// ==================== TAB: GOALS ====================
+const GOAL_TYPES = ['Retirement','Education','Major Purchase','Legacy','Travel','Other'];
+function addGoal(){
+  const plan = getPlan(activeId);
+  plan.goals.push({id:uid('g'), name:'', type:'Retirement', priority:'need', targetYear: new Date().getFullYear()+10, amountToday:'', fundedFromPortfolio:true});
+  renderTab();
+}
+function removeGoal(idx){ const plan=getPlan(activeId); plan.goals.splice(idx,1); renderTab(); }
+function updateGoal(idx, field, val){ const plan=getPlan(activeId); plan.goals[idx][field]=val; if(field!=='name') renderTab(); }
+
+function goalsTabHTML(plan){
+  const priorityLabel = {need:'Need', want:'Want', wish:'Wish'};
+  const priorityColor = {need:'var(--bad)', want:'var(--warn)', wish:'var(--cobalt)'};
+  const rows = plan.goals.map((g,i)=>`
+    <tr>
+      <td><input class="compact" value="${g.name||''}" placeholder="e.g. Retire comfortably" onchange="updateGoal(${i},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateGoal(${i},'type',this.value)">${GOAL_TYPES.map(t=>`<option value="${t}" ${g.type===t?'selected':''}>${t}</option>`).join('')}</select></td>
+      <td><select class="compact" onchange="updateGoal(${i},'priority',this.value)">
+        <option value="need" ${g.priority==='need'?'selected':''}>Need</option>
+        <option value="want" ${g.priority==='want'?'selected':''}>Want</option>
+        <option value="wish" ${g.priority==='wish'?'selected':''}>Wish</option>
+      </select></td>
+      <td><input class="compact" type="number" value="${g.targetYear}" style="max-width:90px;" onchange="updateGoal(${i},'targetYear',this.value)"></td>
+      <td><input class="compact" type="number" value="${g.amountToday}" onchange="updateGoal(${i},'amountToday',this.value)"></td>
+      <td style="text-align:center;"><input type="checkbox" ${g.fundedFromPortfolio?'checked':''} onchange="updateGoal(${i},'fundedFromPortfolio',this.checked)" title="Draw this goal as a lump sum from the investable portfolio in the Monte Carlo projection"></td>
+      <td><button class="removeX" onclick="removeGoal(${i})">✕</button></td>
+    </tr>`).join('');
+
+  return `
+  <div class="panel">
+    <h2>Goals</h2>
+    <p class="desc"><strong>Need / Want / Wish</strong> mirrors the classic goals-based planning hierarchy — Needs are non-negotiable, Wants meaningfully improve the plan, Wishes are stretch goals. "Draw from portfolio" goals (retirement lump sums, a home purchase, a wedding) get pulled directly out of the investable portfolio in the target year for the Probability of Success projection; leave it unchecked for goals funded some other way (gifted down payment, separate 529, etc.) that shouldn't hit the main portfolio.</p>
+    <table>
+      <thead><tr><th>Goal</th><th>Type</th><th>Priority</th><th>Target Year</th><th>Amount (today's $)</th><th>Draw from portfolio</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7" style="color:#bbb;">No goals yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addGoal()">+ Add goal</button>
+  </div>
+
+  <div class="panel">
+    <h2>Priority Legend</h2>
+    <div style="display:flex; gap:18px; flex-wrap:wrap;">
+      ${Object.keys(priorityLabel).map(k=>`<span class="flag" style="background:${priorityColor[k]}22; color:${priorityColor[k]};">${priorityLabel[k]}</span>`).join('')}
+    </div>
+  </div>
+  `;
+}
+
+// ==================== TAB: PROBABILITY OF SUCCESS (MONTE CARLO) ====================
+function monteCarloTabHTML(plan){
+  const result = monteCarloResult(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0});
+  if(result.trials===0){
+    return `<div class="panel"><div class="empty">Enter a date of birth on the Household tab (and a retirement/life expectancy age) to run the projection.</div></div>`;
+  }
+  const rate = result.successRate;
+  const tone = rate>=80 ? 'good' : rate>=60 ? 'warn' : 'bad';
+  const barColor = rate>=80 ? 'var(--good)' : rate>=60 ? 'var(--warn)' : 'var(--bad)';
+
+  return `
+  <div class="panel">
+    <h2>Probability of Success</h2>
+    <p class="desc">Monte Carlo simulation (${result.trials} trials) of the investable portfolio from today through age ${num(plan.household.client1.lifeExpectancy)||92}, using the return/volatility/inflation assumptions below. "Success" means the portfolio never runs out across the full retirement horizon in that trial.</p>
+    <div class="pos-meter">
+      <div>
+        <div class="pos-num ${tone}">${rate}%</div>
+        <div class="pos-label">Probability of Success</div>
+      </div>
+      <div class="pos-track"><div class="pos-fill" style="width:${rate}%; background:${barColor};"></div></div>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
+      ${rate>=80 ? '<span class="gap-flag aligned">On track</span>' : rate>=60 ? '<span class="gap-flag under">Needs attention</span>' : '<span class="gap-flag over">At risk — plan changes likely needed</span>'}
+    </div>
+  </div>
+
+  <div class="summary-cards">
+    <div class="scard"><div class="label">Years to Retirement</div><div class="value">${result.yearsToRetire}</div></div>
+    <div class="scard"><div class="label">Years in Retirement</div><div class="value">${result.yearsInRetirement}</div></div>
+    <div class="scard"><div class="label">Starting Portfolio</div><div class="value">${fmt$(result.startingPortfolio)}</div></div>
+    <div class="scard"><div class="label">Median Ending Balance</div><div class="value">${fmt$(result.medianEndingBalance)}</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Retirement Cash Flow Assumptions</h2>
+    <div class="row">
+      <div class="field"><label>Desired retirement spending / yr (leave blank to use current expenses)</label>
+        <input type="number" value="${plan.assumptions.desiredRetirementSpending}" onchange="update('assumptions.desiredRetirementSpending', this.value); renderTab();"></div>
+      <div class="field"><label>Inflation rate %</label><input type="number" step="0.1" value="${plan.assumptions.inflationRate}" onchange="update('assumptions.inflationRate', this.value); renderTab();"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Pre-retirement expected return %</label><input type="number" step="0.1" value="${plan.assumptions.preRetirementReturn}" onchange="update('assumptions.preRetirementReturn', this.value); renderTab();"></div>
+      <div class="field"><label>Post-retirement expected return %</label><input type="number" step="0.1" value="${plan.assumptions.postRetirementReturn}" onchange="update('assumptions.postRetirementReturn', this.value); renderTab();"></div>
+      <div class="field"><label>Return volatility (std dev) %</label><input type="number" step="0.1" value="${plan.assumptions.returnVol}" onchange="update('assumptions.returnVol', this.value); renderTab();"></div>
+    </div>
+    <div class="field" style="max-width:200px;">
+      <label>Simulation trials</label>
+      <input type="number" value="${plan.monteCarlo.trials}" onchange="update('monteCarlo.trials', this.value); renderTab();">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Guaranteed Income Included</h2>
+    <p class="desc">Pulled from the Social Security and Pensions tabs — this offsets retirement spending in the projection above.</p>
+    <div style="font-size:20px; font-weight:800; color:var(--navy);">${fmt$(result.guaranteed)}<span style="font-size:12px; font-weight:600; color:var(--ink-dim);"> / yr</span></div>
+  </div>
+
+  <div class="note"><strong>Methodology:</strong> This is a single-portfolio, single-goal-stream simulation using lognormal-ish annual returns drawn per trial-year from the return/volatility assumptions above — it does not model asset-class-level correlation, sequence-of-returns beyond the random draw itself, taxes, or Medicare/long-term-care costs. Treat the percentage as a directional planning signal, not a guarantee, and pair it with the advisor's judgment on the specific plan.</div>
+  `;
+}
+
+// ==================== TAB: WHAT-IF / ELASTICITY ====================
+function whatIfSlider(id, label, value, min, max, step, displayFn){
+  return `
+  <div class="slider-row">
+    <div class="sr-head"><span>${label}</span><span class="sr-val" id="${id}Val">${displayFn(value)}</span></div>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" oninput="onWhatIfChange('${id}', this.value)">
+  </div>`;
+}
+
+function onWhatIfChange(id, val){
+  val = parseFloat(val);
+  if(id==='wiRetireAge') whatIf.retireAgeDelta = val;
+  else if(id==='wiSpending') whatIf.spendingPct = val;
+  else if(id==='wiSavings') whatIf.savingsPct = val;
+  else if(id==='wiReturn') whatIf.returnDelta = val;
+  // Live-update just the value labels + result panel, without a full re-render (keeps slider drag smooth).
+  const labels = {wiRetireAge:(v)=> (v>=0?'+':'')+v+' yrs', wiSpending:(v)=>v+'%', wiSavings:(v)=>v+'%', wiReturn:(v)=>(v>=0?'+':'')+v+'%'};
+  const lbl = $id(id+'Val'); if(lbl) lbl.textContent = labels[id](val);
+  const plan = getPlan(activeId);
+  const result = monteCarloResult(plan, whatIf, 300);
+  const resultWrap = $id('whatIfResult');
+  if(resultWrap) resultWrap.innerHTML = whatIfResultHTML(result);
+  renderClientList();
+}
+
+function whatIfResultHTML(result){
+  if(result.trials===0) return '<div class="empty">Not enough data to project.</div>';
+  const rate = result.successRate;
+  const tone = rate>=80 ? 'good' : rate>=60 ? 'warn' : 'bad';
+  const barColor = rate>=80 ? 'var(--good)' : rate>=60 ? 'var(--warn)' : 'var(--bad)';
+  return `
+    <div class="pos-meter">
+      <div><div class="pos-num ${tone}">${rate}%</div><div class="pos-label">Probability of Success</div></div>
+      <div class="pos-track"><div class="pos-fill" style="width:${rate}%; background:${barColor};"></div></div>
+    </div>
+    <div style="margin-top:10px; font-size:12.5px; color:var(--ink-dim);">Median ending balance: ${fmt$(result.medianEndingBalance)}</div>
+  `;
+}
+
+function resetWhatIf(){
+  whatIf = {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0};
+  renderTab();
+}
+
+function whatIfTabHTML(plan){
+  const baseline = monteCarloResult(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}, 300);
+  const current = monteCarloResult(plan, whatIf, 300);
+  return `
+  <div class="panel">
+    <h2>What-If / Elasticity Testing</h2>
+    <p class="desc">Drag the levers to see how retirement age, spending, savings, and expected return move the probability of success — this is the client-facing "play zone" conversation. Changes here don't get saved to the plan; they're for live discussion. Use the Household/Cash Flow/Assumptions tabs to actually change the plan's baseline.</p>
+    <div class="row">
+      <div style="flex:1; min-width:280px;">
+        ${whatIfSlider('wiRetireAge','Retirement age', whatIf.retireAgeDelta, -10, 10, 1, v=>(v>=0?'+':'')+v+' yrs')}
+        ${whatIfSlider('wiSpending','Retirement spending', whatIf.spendingPct, 60, 140, 5, v=>v+'%')}
+        ${whatIfSlider('wiSavings','Pre-retirement savings rate', whatIf.savingsPct, 0, 200, 5, v=>v+'%')}
+        ${whatIfSlider('wiReturn','Expected return adjustment', whatIf.returnDelta, -3, 3, 0.25, v=>(v>=0?'+':'')+v+'%')}
+        <button class="btn secondary" onclick="resetWhatIf()">Reset to baseline</button>
+      </div>
+      <div style="flex:1; min-width:280px;">
+        <div class="subhead">Baseline</div>
+        ${whatIfResultHTML(baseline)}
+        <div class="divider"></div>
+        <div class="subhead">With adjustments</div>
+        <div id="whatIfResult">${whatIfResultHTML(current)}</div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+// ==================== TAB: SOCIAL SECURITY ====================
+function socSecTabHTML(plan){
+  const ss = plan.socialSecurity;
+  const table1 = ss.pia1 ? ssComparisonTable(ss.pia1, ss.fra1) : [];
+  const table2 = (plan.household.hasClient2 && ss.pia2) ? ssComparisonTable(ss.pia2, ss.fra2) : [];
+  const breakeven1 = ss.pia1 ? ssBreakevenAge(ss.pia1, ss.fra1, 62, 70) : null;
+
+  const renderTable = (rows, claimAge) => rows.length ? `
+    <table>
+      <thead><tr><th>Claim Age</th><th>Monthly Benefit</th><th>Annual Benefit</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr style="${r.age===num(claimAge)?'background:#eaf0fe;':''}"><td>${r.age}${r.age===62?' (earliest)':r.age===70?' (max)':''}</td><td>${fmt$(r.monthly)}</td><td>${fmt$(r.annual)}</td></tr>`).join('')}</tbody>
+    </table>` : '<div class="empty">Enter a Primary Insurance Amount (PIA) to see the claiming-age comparison.</div>';
+
+  return `
+  <div class="panel">
+    <h2>Client 1</h2>
+    <div class="row">
+      <div class="field"><label>Primary Insurance Amount (monthly, at Full Retirement Age)</label><input type="number" value="${ss.pia1}" onchange="update('socialSecurity.pia1', this.value); renderTab();"></div>
+      <div class="field"><label>Full Retirement Age (FRA)</label><input type="number" step="0.5" value="${ss.fra1}" onchange="update('socialSecurity.fra1', this.value); renderTab();"></div>
+      <div class="field"><label>Planned claiming age</label><input type="number" step="0.5" min="62" max="70" value="${ss.claimAge1}" onchange="update('socialSecurity.claimAge1', this.value); renderTab(); renderClientList();"></div>
+    </div>
+    <div class="subhead">Claiming-Age Comparison</div>
+    ${renderTable(table1, ss.claimAge1)}
+    ${breakeven1 ? `<div style="margin-top:10px; font-size:12.5px; color:var(--ink-dim);">Breakeven age (claim 70 vs. 62): roughly age <strong>${breakeven1}</strong> — after that, delaying to 70 wins on cumulative lifetime benefit.</div>` : ''}
+  </div>
+
+  ${plan.household.hasClient2 ? `
+  <div class="panel">
+    <h2>Client 2</h2>
+    <div class="row">
+      <div class="field"><label>Primary Insurance Amount (monthly, at Full Retirement Age)</label><input type="number" value="${ss.pia2}" onchange="update('socialSecurity.pia2', this.value); renderTab();"></div>
+      <div class="field"><label>Full Retirement Age (FRA)</label><input type="number" step="0.5" value="${ss.fra2}" onchange="update('socialSecurity.fra2', this.value); renderTab();"></div>
+      <div class="field"><label>Planned claiming age</label><input type="number" step="0.5" min="62" max="70" value="${ss.claimAge2}" onchange="update('socialSecurity.claimAge2', this.value); renderTab(); renderClientList();"></div>
+    </div>
+    <div class="subhead">Claiming-Age Comparison</div>
+    ${renderTable(table2, ss.claimAge2)}
+  </div>` : ''}
+
+  <div class="panel">
+    <h2>Pensions</h2>
+    <table>
+      <thead><tr><th>Owner</th><th>Monthly Amount</th><th>Start Age</th><th></th></tr></thead>
+      <tbody>${plan.pensions.map((p,i)=>`
+        <tr>
+          <td><select class="compact" onchange="updatePension(${i},'owner',this.value)">
+            <option value="client1" ${p.owner==='client1'?'selected':''}>Client 1</option>
+            ${plan.household.hasClient2?`<option value="client2" ${p.owner==='client2'?'selected':''}>Client 2</option>`:''}
+          </select></td>
+          <td><input class="compact" type="number" value="${p.monthlyAmount}" onchange="updatePension(${i},'monthlyAmount',this.value)"></td>
+          <td><input class="compact" type="number" value="${p.startAge}" onchange="updatePension(${i},'startAge',this.value)"></td>
+          <td><button class="removeX" onclick="removePension(${i})">✕</button></td>
+        </tr>`).join('') || '<tr><td colspan="4" style="color:#bbb;">No pensions entered.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addPension()">+ Add pension</button>
+  </div>
+
+  <div class="note"><strong>Methodology:</strong> Uses the SSA's standard actuarial reduction/increase factors (5/9 of 1% per month for the first 36 months before FRA, 5/12 of 1% per month beyond that, and 2/3 of 1% per month of delayed retirement credit up to age 70). This is an estimate for planning conversations, not a substitute for the client's actual SSA benefit statement.</div>
+  `;
+}
+function addPension(){ const plan=getPlan(activeId); plan.pensions.push({id:uid('pen'), owner:'client1', monthlyAmount:'', startAge:65}); renderTab(); }
+function removePension(idx){ const plan=getPlan(activeId); plan.pensions.splice(idx,1); renderTab(); }
+function updatePension(idx, field, val){ const plan=getPlan(activeId); plan.pensions[idx][field]=val; renderTab(); }
+
+// ==================== TAB: INSURANCE NEEDS ====================
+function insuranceOwnerBlockHTML(plan, ownerKey, label, show){
+  if(!show) return '';
+  const ins = plan.insurance[ownerKey];
+  const result = lifeInsuranceNeed(plan, ownerKey);
+  return `
+  <div class="panel">
+    <h2>Life Insurance — ${label}</h2>
+    <div class="row">
+      <div class="field"><label>Income replacement (years)</label><input type="number" value="${ins.incomeReplaceYears}" onchange="update('insurance.${ownerKey}.incomeReplaceYears', this.value); renderTab();"></div>
+      <div class="field"><label>Existing coverage</label><input type="number" value="${ins.existingCoverage}" onchange="update('insurance.${ownerKey}.existingCoverage', this.value); renderTab();"></div>
+      <div class="field"><label>Debt to pay off</label><input type="number" value="${ins.debtPayoff}" onchange="update('insurance.${ownerKey}.debtPayoff', this.value); renderTab();"></div>
+      <div class="field"><label>Final expenses</label><input type="number" value="${ins.finalExpenses}" onchange="update('insurance.${ownerKey}.finalExpenses', this.value); renderTab();"></div>
+      <div class="field"><label>Future education funding to cover</label><input type="number" value="${ins.eduFundGoal}" onchange="update('insurance.${ownerKey}.eduFundGoal', this.value); renderTab();"></div>
+    </div>
+    <div class="summary-cards" style="margin-top:6px;">
+      <div class="scard"><div class="label">Income to Replace / yr</div><div class="value">${fmt$(result.ownerIncome)}</div></div>
+      <div class="scard"><div class="label">Gross Need</div><div class="value">${fmt$(result.gross)}</div></div>
+      <div class="scard bad"><div class="label">Coverage Gap</div><div class="value">${fmt$(result.need)}</div></div>
+    </div>
+  </div>`;
+}
+function disabilityOwnerBlockHTML(plan, ownerKey, label, show){
+  if(!show) return '';
+  const d = plan.insurance[ownerKey];
+  const result = disabilityGap(plan, ownerKey);
+  return `
+  <div class="panel">
+    <h2>Disability Insurance — ${label}</h2>
+    <div class="row">
+      <div class="field"><label>Monthly expenses to cover</label><input type="number" value="${d.monthlyExpenses}" onchange="update('insurance.${ownerKey}.monthlyExpenses', this.value); renderTab();"></div>
+      <div class="field"><label>Existing disability benefit (monthly)</label><input type="number" value="${d.existingBenefit}" onchange="update('insurance.${ownerKey}.existingBenefit', this.value); renderTab();"></div>
+    </div>
+    <div class="summary-cards" style="margin-top:6px;">
+      <div class="scard bad"><div class="label">Monthly Gap</div><div class="value">${fmt$(result.gap)}</div></div>
+    </div>
+  </div>`;
+}
+function insuranceTabHTML(plan){
+  return `
+  ${insuranceOwnerBlockHTML(plan, 'life1', 'Client 1', true)}
+  ${insuranceOwnerBlockHTML(plan, 'life2', 'Client 2', plan.household.hasClient2)}
+  ${disabilityOwnerBlockHTML(plan, 'disability1', 'Client 1', true)}
+  ${disabilityOwnerBlockHTML(plan, 'disability2', 'Client 2', plan.household.hasClient2)}
+  <div class="note"><strong>Methodology:</strong> Life insurance need uses a simplified income-replacement + debt + final-expenses + education approach (DIME-style), net of existing coverage. It does not net out liquid net worth or run a full human-life-value calculation — the advisor should apply judgment on whether other assets should offset the need. Disability gap is a simple monthly-expense-minus-existing-benefit calculation and does not account for elimination periods, benefit taxability, or own-occupation vs. any-occupation definitions.</div>
+  `;
+}
+
+// ==================== TAB: EDUCATION FUNDING ====================
+function addEducationGoal(){
+  const plan = getPlan(activeId);
+  plan.education.push({id:uid('edu'), name:'', currentAge:'', collegeAge:18, yearsInCollege:4, currentCostPerYear:'', inflationRate:5, currentSavings:'', monthlyContribution:''});
+  renderTab();
+}
+function removeEducationGoal(idx){ const plan=getPlan(activeId); plan.education.splice(idx,1); renderTab(); }
+function updateEducationGoal(idx, field, val){ const plan=getPlan(activeId); plan.education[idx][field]=val; if(field!=='name') renderTab(); }
+
+function educationTabHTML(plan){
+  if(!plan.education.length){
+    return `<div class="panel"><h2>Education Funding</h2><div class="empty">No education goals yet.</div><button class="addRowBtn" onclick="addEducationGoal()">+ Add education goal</button></div>`;
+  }
+  return plan.education.map((g,i)=>{
+    const proj = educationProjection(g);
+    const shortfall = proj.requiredMonthly - proj.currentMonthlyContribution;
+    return `
+    <div class="panel">
+      <div class="toolbar" style="margin-bottom:14px;">
+        <h2 style="margin:0;">${g.name || 'Education goal '+(i+1)}</h2>
+        <button class="removeX" onclick="removeEducationGoal(${i})">✕ Remove</button>
+      </div>
+      <div class="row">
+        <div class="field"><label>Beneficiary name</label><input value="${g.name||''}" onchange="updateEducationGoal(${i},'name',this.value)"></div>
+        <div class="field"><label>Current age</label><input type="number" value="${g.currentAge}" onchange="updateEducationGoal(${i},'currentAge',this.value)"></div>
+        <div class="field"><label>Age starting college</label><input type="number" value="${g.collegeAge}" onchange="updateEducationGoal(${i},'collegeAge',this.value)"></div>
+        <div class="field"><label>Years in college</label><input type="number" value="${g.yearsInCollege}" onchange="updateEducationGoal(${i},'yearsInCollege',this.value)"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Current annual cost (today's $)</label><input type="number" value="${g.currentCostPerYear}" onchange="updateEducationGoal(${i},'currentCostPerYear',this.value)"></div>
+        <div class="field"><label>Education cost inflation %</label><input type="number" step="0.1" value="${g.inflationRate}" onchange="updateEducationGoal(${i},'inflationRate',this.value)"></div>
+        <div class="field"><label>Current savings (529, etc.)</label><input type="number" value="${g.currentSavings}" onchange="updateEducationGoal(${i},'currentSavings',this.value)"></div>
+        <div class="field"><label>Current monthly contribution</label><input type="number" value="${g.monthlyContribution}" onchange="updateEducationGoal(${i},'monthlyContribution',this.value)"></div>
+      </div>
+      <div class="summary-cards">
+        <div class="scard"><div class="label">Years Until College</div><div class="value">${proj.yearsUntilCollege}</div></div>
+        <div class="scard"><div class="label">Future Total Cost</div><div class="value">${fmt$(proj.futureTotalCost)}</div></div>
+        <div class="scard"><div class="label">Funding Gap (future $)</div><div class="value">${fmt$(proj.gap)}</div></div>
+        <div class="scard ${shortfall>0?'bad':'good'}"><div class="label">Required Monthly Savings</div><div class="value">${fmt$(proj.requiredMonthly)}</div></div>
+      </div>
+      ${shortfall>0 ? `<div class="gap-flag over">Currently saving ${fmt$(proj.currentMonthlyContribution)}/mo — short by ${fmt$(shortfall)}/mo</div>` : `<div class="gap-flag aligned">Current contribution covers the projected gap</div>`}
+    </div>`;
+  }).join('') + `<button class="addRowBtn" onclick="addEducationGoal()">+ Add another education goal</button>
+  <div class="note" style="margin-top:16px;"><strong>Methodology:</strong> Future cost assumes the entered education-cost inflation rate compounds through each year of college. Savings are assumed to grow at 6%/yr (a simplified 529-style blended-allocation assumption, not editable per-goal in this version). Required monthly savings solves for the ordinary-annuity payment that closes the gap by the time college starts.</div>`;
+}
+
+// ==================== PDF REPORT ====================
+function buildPlanPDF(clientId){
+  const sc = getSharedClient(clientId);
+  const plan = getPlan(clientId);
+  const name = clientName(sc);
+  const nw = netWorthTotals(plan);
+  const cf = cashFlowTotals(plan);
+  const mc = monteCarloResult(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0});
+  const rate = mc.successRate;
+
+  const assetRows = plan.netWorth.assets.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(a.category)}</td><td>${fmt$(a.value)}</td></tr>`).join('');
+  const liabRows = plan.netWorth.liabilities.map(l=>`<tr><td>${esc(l.name)}</td><td>${esc(l.category)}</td><td>${fmt$(l.balance)}</td></tr>`).join('');
+  const goalRows = plan.goals.map(g=>`<tr><td>${esc(g.name)}</td><td>${esc(g.type)}</td><td style="text-transform:capitalize;">${esc(g.priority)}</td><td>${esc(g.targetYear)}</td><td>${fmt$(g.amountToday)}</td></tr>`).join('');
+
+  const ss = plan.socialSecurity;
+  const ssTable1 = ss.pia1 ? ssComparisonTable(ss.pia1, ss.fra1).map(r=>`<tr><td>${r.age}</td><td>${fmt$(r.monthly)}</td><td>${fmt$(r.annual)}</td></tr>`).join('') : '';
+
+  const life1 = lifeInsuranceNeed(plan, 'life1');
+  const life2 = plan.household.hasClient2 ? lifeInsuranceNeed(plan, 'life2') : null;
+
+  const eduRows = plan.education.map(g=>{
+    const proj = educationProjection(g);
+    return `<tr><td>${esc(g.name)}</td><td>${proj.yearsUntilCollege}</td><td>${fmt$(proj.futureTotalCost)}</td><td>${fmt$(proj.gap)}</td><td>${fmt$(proj.requiredMonthly)}</td></tr>`;
+  }).join('');
+
+  return `
+    <div class="pdf-letterhead">
+      <div class="firm">Redmount Capital Partners LLC</div>
+      <div class="addr">23 Corporate Plaza Drive, Suite 150, Newport Beach, CA 92660</div>
+    </div>
+    <div class="pdf-title">Financial Plan — ${esc(name)}</div>
+    <div class="pdf-sub">Prepared ${new Date().toLocaleDateString()}</div>
+
+    <div class="pdf-section">
+      <h3>Summary</h3>
+      <div class="pdf-scores">
+        <div class="s"><div class="num">${rate!==null?rate+'%':'—'}</div><div class="lbl">Probability of Success</div></div>
+        <div class="s"><div class="num">${fmt$(nw.net)}</div><div class="lbl">Net Worth</div></div>
+        <div class="s"><div class="num">${fmt$(cf.net)}</div><div class="lbl">Net Cash Flow / yr</div></div>
+        <div class="s"><div class="num">${fmt$(investablePortfolioValue(plan))}</div><div class="lbl">Investable Portfolio</div></div>
+      </div>
+    </div>
+
+    <div class="pdf-section">
+      <h3>Net Worth</h3>
+      <div class="pdf-grid two">
+        <div>
+          <div style="font-size:11px; font-weight:700; margin-bottom:4px;">Assets — ${fmt$(nw.assets)}</div>
+          <table class="pdf-table"><thead><tr><th>Name</th><th>Category</th><th>Value</th></tr></thead><tbody>${assetRows || '<tr><td colspan="3" style="color:#bbb;">None</td></tr>'}</tbody></table>
+        </div>
+        <div>
+          <div style="font-size:11px; font-weight:700; margin-bottom:4px;">Liabilities — ${fmt$(nw.liabilities)}</div>
+          <table class="pdf-table"><thead><tr><th>Name</th><th>Category</th><th>Balance</th></tr></thead><tbody>${liabRows || '<tr><td colspan="3" style="color:#bbb;">None</td></tr>'}</tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pdf-section">
+      <h3>Cash Flow</h3>
+      <div class="pdf-grid">
+        <div class="pdf-field"><div class="l">Total Income</div><div class="v">${fmt$(cf.income)}</div></div>
+        <div class="pdf-field"><div class="l">Total Expenses</div><div class="v">${fmt$(cf.expenses)}</div></div>
+        <div class="pdf-field"><div class="l">Net Cash Flow</div><div class="v">${fmt$(cf.net)}</div></div>
+      </div>
+    </div>
+
+    <div class="pdf-section">
+      <h3>Goals</h3>
+      <table class="pdf-table"><thead><tr><th>Goal</th><th>Type</th><th>Priority</th><th>Target Year</th><th>Amount (today's $)</th></tr></thead>
+        <tbody>${goalRows || '<tr><td colspan="5" style="color:#bbb;">No goals entered</td></tr>'}</tbody></table>
+    </div>
+
+    <div class="pdf-page-break">
+      <div class="pdf-letterhead">
+        <div class="firm">Redmount Capital Partners LLC</div>
+        <div class="addr">23 Corporate Plaza Drive, Suite 150, Newport Beach, CA 92660</div>
+      </div>
+      <div class="pdf-title">Probability of Success — ${esc(name)}</div>
+      <div class="pdf-section">
+        <div class="pdf-scores">
+          <div class="s"><div class="num">${rate!==null?rate+'%':'—'}</div><div class="lbl">Success Rate</div></div>
+          <div class="s"><div class="num">${mc.yearsToRetire??'—'}</div><div class="lbl">Years to Retirement</div></div>
+          <div class="s"><div class="num">${mc.yearsInRetirement??'—'}</div><div class="lbl">Years in Retirement</div></div>
+          <div class="s"><div class="num">${mc.medianEndingBalance!==null&&mc.medianEndingBalance!==undefined?fmt$(mc.medianEndingBalance):'—'}</div><div class="lbl">Median Ending Balance</div></div>
+        </div>
+        <div style="font-size:10px; color:var(--ink-dim); margin-top:6px;">Monte Carlo simulation (${mc.trials||0} trials). Illustrative planning estimate — not a guarantee of any outcome. See methodology on the final page.</div>
+      </div>
+
+      <div class="pdf-section">
+        <h3>Social Security — Client 1</h3>
+        ${ss.pia1 ? `<table class="pdf-table"><thead><tr><th>Claim Age</th><th>Monthly</th><th>Annual</th></tr></thead><tbody>${ssTable1}</tbody></table>` : '<div style="color:#bbb; font-size:11px;">Not entered</div>'}
+      </div>
+
+      <div class="pdf-section">
+        <h3>Life Insurance Needs</h3>
+        <table class="pdf-table">
+          <thead><tr><th></th><th>Income to Replace</th><th>Gross Need</th><th>Existing Coverage</th><th>Gap</th></tr></thead>
+          <tbody>
+            <tr><td>Client 1</td><td>${fmt$(life1.ownerIncome)}</td><td>${fmt$(life1.gross)}</td><td>${fmt$(life1.existingCoverage)}</td><td>${fmt$(life1.need)}</td></tr>
+            ${life2 ? `<tr><td>Client 2</td><td>${fmt$(life2.ownerIncome)}</td><td>${fmt$(life2.gross)}</td><td>${fmt$(life2.existingCoverage)}</td><td>${fmt$(life2.need)}</td></tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+
+      ${plan.education.length ? `
+      <div class="pdf-section">
+        <h3>Education Funding</h3>
+        <table class="pdf-table">
+          <thead><tr><th>Beneficiary</th><th>Years Until College</th><th>Future Total Cost</th><th>Funding Gap</th><th>Required Monthly</th></tr></thead>
+          <tbody>${eduRows}</tbody>
+        </table>
+      </div>` : ''}
+    </div>
+
+    <div class="pdf-page-break">
+      <div class="pdf-letterhead">
+        <div class="firm">Redmount Capital Partners LLC</div>
+        <div class="addr">23 Corporate Plaza Drive, Suite 150, Newport Beach, CA 92660</div>
+      </div>
+      <div class="pdf-title">Disclosures &amp; Methodology</div>
+      <div class="pdf-section">
+        <h3>Probability of Success</h3>
+        <div class="pdf-notes">A single-portfolio, single-goal-stream Monte Carlo simulation using lognormal-ish annual returns drawn per trial-year from the return, volatility, and inflation assumptions on file. Does not model asset-class-level correlation, taxes, Medicare or long-term-care costs, or sequence-of-returns risk beyond the random draw itself. A directional planning signal, not a guarantee of future performance or outcome.</div>
+      </div>
+      <div class="pdf-section">
+        <h3>Social Security</h3>
+        <div class="pdf-notes">Estimates use the Social Security Administration's standard actuarial reduction and delayed-retirement-credit factors applied to the Primary Insurance Amount (PIA) entered. Not a substitute for the client's official SSA benefit statement.</div>
+      </div>
+      <div class="pdf-section">
+        <h3>Insurance Needs</h3>
+        <div class="pdf-notes">Life insurance need uses a simplified income-replacement plus debt plus final-expenses plus education approach, net of existing coverage — it does not net out liquid net worth or perform a full human-life-value calculation. Disability gap is monthly expenses minus existing benefit, without regard to elimination periods or benefit taxability.</div>
+      </div>
+      <div class="pdf-section">
+        <h3>Education Funding</h3>
+        <div class="pdf-notes">Future cost compounds the entered education-cost inflation rate through each year of college. Savings are assumed to grow at a blended 6%/yr. Required monthly savings solves for the ordinary-annuity payment needed to close the funding gap by the time college starts.</div>
+      </div>
+      <div class="pdf-sig-row">
+        <div class="pdf-sig">Client acknowledges review of this plan &nbsp;&nbsp;&nbsp;&nbsp; Date</div>
+        <div class="pdf-sig">Advisor &nbsp;&nbsp;&nbsp;&nbsp; Date</div>
+      </div>
+    </div>
+  `;
+}
+
+function downloadPlanPDF(clientId){
+  $id('printArea').innerHTML = buildPlanPDF(clientId);
+  window.print();
+}
+window.addEventListener('afterprint', ()=>{ const p = $id('printArea'); if(p) p.innerHTML = ''; });
+
+// ==================== BOOTSTRAP ====================
+document.addEventListener('DOMContentLoaded', function(){
+  const toolSwitcher = $id('toolSwitcher');
+  if(toolSwitcher) toolSwitcher.addEventListener('change', function(){ if(this.value) window.location.href = this.value; });
+  tryAutoLogin();
+});
+</script>
+</body>
+</html>
