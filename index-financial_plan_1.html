@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redmount Financial Plan</title>
+<style>
+  :root{
+    --navy:#002347; --navy-2:#01315f; --cobalt:#2f6fed; --cobalt-dim:#5b8bf0;
+    --paper:#f6f7fa; --card:#ffffff; --line:#e2e6ee; --ink:#0e1a2b; --ink-dim:#5b6b82;
+    --good:#177350; --good-bg:#e7f5ee; --warn:#8a5a00; --warn-bg:#fff3de;
+    --bad:#9c2b2b; --bad-bg:#fbe9e9; --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:-apple-system,"Segoe UI",Helvetica,Arial,sans-serif; background:var(--paper); color:var(--ink);}
+  .shell{display:flex; min-height:100vh;}
+  .sidebar{width:250px; flex-shrink:0; background:var(--navy); color:#cfe0ff; padding:22px 18px; display:flex; flex-direction:column; gap:20px; position:sticky; top:0; height:100vh; overflow-y:auto;}
+  .brand{font-size:15px; font-weight:700; color:#fff;}
+  .brand small{display:block; font-weight:400; color:#9fb8e6; font-size:11px; margin-top:2px;}
+  .client-list{display:flex; flex-direction:column; gap:2px; overflow-y:auto;}
+  .client-item{padding:9px 10px; border-radius:8px; cursor:pointer; font-size:13px; color:#b7c9e8; display:flex; justify-content:space-between; align-items:center;}
+  .client-item:hover{color:#fff;}
+  .client-item.active{background:var(--navy-2); color:#fff; font-weight:600;}
+  .client-item .gapdot{width:8px; height:8px; border-radius:50%; flex-shrink:0;}
+  .side-foot{margin-top:auto; font-size:11px; color:#7d92b8; line-height:1.5;}
+  .tool-switcher-label{font-size:10px; text-transform:uppercase; letter-spacing:.06em; color:#7d92b8; font-weight:600; margin-bottom:6px;}
+  .tool-switcher{width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#fff; font-family:inherit; font-size:12.5px; padding:8px 9px; border-radius:6px;}
+  .tool-switcher option{color:#111;}
+  .nav-divider{height:1px; background:rgba(255,255,255,0.12); margin:4px 0;}
+  .main{flex:1; padding:32px 40px; max-width:1220px;}
+  h1{font-size:22px; margin:0 0 4px;}
+  .sub{color:var(--ink-dim); font-size:13.5px; margin:0 0 22px;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:22px 24px; margin-bottom:22px;}
+  .panel h2{font-size:15px; margin:0 0 4px;}
+  .panel .desc{color:var(--ink-dim); font-size:12.5px; margin:0 0 16px;}
+  .row{display:flex; gap:14px; flex-wrap:wrap;}
+  .field{display:flex; flex-direction:column; gap:5px; margin-bottom:14px; flex:1; min-width:190px;}
+  .field label{font-size:11px; font-weight:600; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.03em;}
+  input, select, textarea{border:1px solid var(--line); border-radius:7px; padding:8px 10px; font-size:13.5px; font-family:inherit; background:#fff; color:var(--ink); width:100%;}
+  input[type="radio"], input[type="checkbox"]{width:auto; border:none; padding:0; background:none; border-radius:0; accent-color:var(--cobalt); flex-shrink:0;}
+  input[type="range"]{padding:0; accent-color:var(--cobalt);}
+  input:focus, select:focus, textarea:focus{outline:2px solid var(--cobalt-dim); outline-offset:0; border-color:var(--cobalt);}
+  .btn{background:var(--cobalt); color:#fff; border:none; border-radius:7px; padding:9px 16px; font-size:13px; font-weight:600; cursor:pointer;}
+  .btn:hover{background:#2660d4;}
+  .btn.secondary{background:#fff; color:var(--navy); border:1px solid var(--line);}
+  .btn.secondary:hover{background:#f0f3f8;}
+  .btn.ghost{background:transparent; color:var(--ink-dim); border:1px solid var(--line); padding:6px 10px; font-size:12px;}
+  .btn.ghost:hover{background:#f0f3f8; color:var(--navy);}
+  .btn.danger{background:transparent; color:var(--bad); border:1px solid #efc6c6; padding:6px 10px; font-size:12px;}
+  .btn.danger:hover{background:var(--bad-bg);}
+  .btn:disabled{opacity:.5; cursor:not-allowed;}
+  .tabs{display:flex; gap:4px; margin-bottom:20px; border-bottom:1px solid var(--line); overflow-x:auto;}
+  .tab{padding:10px 14px; font-size:13px; font-weight:600; color:var(--ink-dim); cursor:pointer; border-bottom:2px solid transparent; white-space:nowrap;}
+  .tab.active{color:var(--cobalt); border-color:var(--cobalt);}
+  .subhead{font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--navy); margin:20px 0 10px;}
+  .subhead:first-child{margin-top:0;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.03em; color:var(--ink-dim); border-bottom:1px solid var(--line); padding:8px 10px; font-weight:600;}
+  td{padding:8px 10px; border-bottom:1px solid #eef1f6; vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .empty{border:1px dashed var(--line); border-radius:8px; padding:24px; text-align:center; color:var(--ink-dim); font-size:13px;}
+  .gauge-wrap{display:flex; gap:26px; flex-wrap:wrap; align-items:flex-start;}
+  .bar-track{height:10px; background:#eef1f6; border-radius:99px; margin:8px 0; position:relative; overflow:hidden;}
+  .bar-fill{height:100%; border-radius:99px; background:linear-gradient(90deg,#2f6fed,#7aa5f5);}
+  .gap-flag{display:inline-block; margin-top:10px; padding:5px 12px; border-radius:99px; font-size:12px; font-weight:700;}
+  .gap-flag.aligned{background:var(--good-bg); color:var(--good);}
+  .gap-flag.over{background:var(--bad-bg); color:var(--bad);}
+  .gap-flag.under{background:var(--warn-bg); color:var(--warn);}
+  .summary-cards{display:flex; gap:14px; margin-bottom:22px; flex-wrap:wrap;}
+  .scard{flex:1; min-width:150px; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px;}
+  .scard .label{font-size:11px; text-transform:uppercase; color:var(--ink-dim); letter-spacing:.03em;}
+  .scard .value{font-size:26px; font-weight:800; margin-top:4px; color:var(--navy);}
+  .scard.warn .value{color:var(--warn);}
+  .scard.bad .value{color:var(--bad);}
+  .scard.good .value{color:var(--good);}
+  .divider{height:1px; background:var(--line); margin:18px 0;}
+  .flag{padding:2px 9px; border-radius:6px; font-size:11px; font-weight:600; display:inline-block; background:#eef1f6; color:var(--ink-dim);}
+  .flag.ok{background:var(--good-bg); color:var(--good);}
+  .flag.err{background:var(--bad-bg); color:var(--bad);}
+  .flag.warn{background:var(--warn-bg); color:var(--warn);}
+  .compact{font-size:12.5px !important; padding:5px 8px !important;}
+  .signout-link{color:#b7c9e8;}
+  .signout-link:hover{color:#fff;}
+  .note{background:var(--warn-bg); border:1px solid #f0dcaa; color:#6b4a00; border-radius:8px; padding:12px 14px; font-size:12.5px; line-height:1.5; margin-bottom:18px;}
+  .note strong{color:#3d2c00;}
+  .toolbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;}
+  footer.tool-foot{font-size:11.5px; color:var(--ink-dim); margin-top:6px; text-align:right;}
+  .rowline{display:flex; gap:8px; align-items:center; margin-bottom:6px;}
+  .rowline .grow{flex:1;}
+  .removeX{background:none; border:none; color:var(--ink-dim); cursor:pointer; font-size:16px; line-height:1; padding:4px;}
+  .removeX:hover{color:var(--bad);}
+  .addRowBtn{font-size:12.5px; font-weight:600; color:var(--cobalt); background:none; border:1px dashed var(--cobalt-dim); border-radius:7px; padding:7px 12px; cursor:pointer; margin-top:4px;}
+  .addRowBtn:hover{background:#f5f8ff;}
+
+  /* Probability of success gauge */
+  .pos-meter{display:flex; align-items:center; gap:22px; flex-wrap:wrap;}
+  .pos-num{font-size:48px; font-weight:800;}
+  .pos-num.good{color:var(--good);} .pos-num.warn{color:var(--warn);} .pos-num.bad{color:var(--bad);}
+  .pos-label{font-size:12px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-dim); font-weight:700; margin-top:2px;}
+  .pos-track{height:16px; background:#eef1f6; border-radius:99px; overflow:hidden; flex:1; min-width:220px;}
+  .pos-fill{height:100%; border-radius:99px; transition:width .3s;}
+
+  /* What-if sliders */
+  .slider-row{margin-bottom:18px;}
+  .slider-row .sr-head{display:flex; justify-content:space-between; font-size:12.5px; font-weight:600; color:var(--ink); margin-bottom:6px;}
+  .slider-row .sr-head .sr-val{color:var(--cobalt); font-weight:700;}
+
+  .authgate{position:fixed; inset:0; background:var(--paper); display:flex; align-items:center; justify-content:center; z-index:200; padding:24px;}
+  .authcard{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); width:100%; max-width:380px; padding:32px 32px 26px; box-shadow:0 8px 24px -12px rgba(0,35,71,0.18);}
+  .authcard .auth-logo{font-size:15px; font-weight:800; color:var(--navy); letter-spacing:.02em; margin-bottom:6px;}
+  .authcard h1{font-size:21px; margin:14px 0 4px; color:var(--navy);}
+  .authcard p.sub{font-size:12.5px; color:var(--ink-dim); margin:0 0 22px;}
+  .authcard label{display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-dim); margin:16px 0 5px;}
+  .authcard input{width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px; font-size:13.5px; font-family:inherit; box-sizing:border-box;}
+  .authcard input:focus{outline:none; border-color:var(--cobalt);}
+  .authcard button{width:100%; margin-top:20px; padding:11px; background:var(--cobalt); border:none; color:#fff; border-radius:6px; font-size:13px; font-weight:600; cursor:pointer;}
+  .authcard button:disabled{opacity:.6; cursor:not-allowed;}
+  .authcard .err{font-size:12.5px; color:var(--bad); margin-top:10px; display:none;}
+  .authcard .err.show{display:block;}
+  .sync-status{font-size:10.5px; color:#7d92b8; margin-top:4px; display:flex; align-items:center; gap:5px;}
+  .sync-dot{width:6px; height:6px; border-radius:50%; background:#7d92b8; flex-shrink:0;}
+  .sync-dot.saved{background:#3ecf8e;}
+  .sync-dot.saving{background:#e0a83f;}
+  .sync-dot.error{background:#e06767;}
+
+  /* Print / PDF layout */
+  #printArea{display:none;}
+  .pdf-letterhead{margin-bottom:18px; padding-bottom:14px; border-bottom:2px solid var(--navy);}
+  .pdf-letterhead .firm{font-size:18px; font-weight:800; color:var(--navy); letter-spacing:.02em;}
+  .pdf-letterhead .addr{font-size:11.5px; color:var(--ink-dim); margin-top:2px;}
+  .pdf-title{font-size:15px; font-weight:700; color:var(--navy); margin:18px 0 2px;}
+  .pdf-sub{font-size:11.5px; color:var(--ink-dim); margin-bottom:10px;}
+  .pdf-section{margin-top:16px;}
+  .pdf-section h3{font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:var(--navy); border-bottom:1px solid var(--line); padding-bottom:4px; margin:0 0 8px;}
+  .pdf-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:6px 18px; font-size:12px;}
+  .pdf-grid.two{grid-template-columns:repeat(2,1fr);}
+  .pdf-field{display:flex; flex-direction:column;}
+  .pdf-field .l{font-size:9.5px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-dim);}
+  .pdf-field .v{font-size:12px; color:var(--ink); border-bottom:1px solid #eee; padding:1px 0 3px; min-height:15px;}
+  .pdf-table{width:100%; border-collapse:collapse; font-size:11.5px; margin-top:6px;}
+  .pdf-table th{text-align:left; font-size:9.5px; text-transform:uppercase; color:var(--ink-dim); border-bottom:1px solid var(--line); padding:5px 6px;}
+  .pdf-table td{padding:5px 6px; border-bottom:1px solid #f0f0f0;}
+  .pdf-scores{display:flex; gap:30px; margin:10px 0;}
+  .pdf-scores .s{text-align:center;}
+  .pdf-scores .s .num{font-size:26px; font-weight:800; color:var(--navy);}
+  .pdf-scores .s .lbl{font-size:9.5px; text-transform:uppercase; color:var(--ink-dim);}
+  .pdf-sig-row{display:flex; gap:40px; margin-top:34px;}
+  .pdf-page-break{page-break-before:always;}
+  .pdf-sig{flex:1; border-top:1px solid #999; padding-top:5px; font-size:10.5px; color:var(--ink-dim);}
+  .pdf-notes{font-size:12px; white-space:pre-wrap; border:1px solid var(--line); border-radius:4px; padding:8px; min-height:30px;}
+
+  @media (max-width: 760px){
+    .shell{flex-direction:column;}
+    .sidebar{width:100%; flex-direction:row; flex-wrap:wrap; align-items:center; padding:14px 16px; gap:10px; position:static; height:auto; overflow-y:visible;}
+    .sidebar .brand{width:100%;}
+    .sidebar input, .sidebar select, .sidebar .btn{width:auto; flex:1; min-width:110px;}
+    .client-list{width:100%; max-height:140px; overflow-y:auto; order:5;}
+    .tool-switcher-label, .tool-switcher, .nav-divider, .side-foot{width:100%;}
+    .main{padding:18px 16px;}
+    .row{flex-direction:column;}
+    .tabs{flex-wrap:nowrap;}
+    table{font-size:12px;}
+  }
+
+  @media print{
+    body *{visibility:hidden;}
+    #printArea, #printArea *{visibility:visible;}
+    #printArea{display:block; position:absolute; left:0; top:0; width:100%; padding:20px;}
+    @page{margin:0.6in;}
+  }
+</style>
+</head>
+<body>
+<div class="authgate" id="authGate">
+  <div class="authcard">
+    <div class="auth-logo">REDMOUNT</div>
+    <h1>Financial Plan</h1>
+    <p class="sub">Sign in to access client data.</p>
+    <label>Email</label>
+    <input type="email" id="authEmail" autocomplete="username">
+    <label>Password</label>
+    <input type="password" id="authPassword" autocomplete="current-password">
+    <button id="authSubmit">Sign in</button>
+    <div class="err" id="authErr"></div>
+  </div>
+</div>
+<div id="mainApp" style="display:none;">
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">REDMOUNT<small>Financial Plan</small></div>
+    <button class="btn" onclick="addClient()">+ New Client</button>
+    <input type="text" placeholder="Search clients…" oninput="setClientSearch(this.value)"
+      style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:12.5px; padding:7px 9px; border-radius:6px;">
+    <select id="clientDropdown" onchange="if(this.value) selectClient(this.value);"
+      style="width:100%; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.18); color:#fff; font-size:12.5px; padding:7px 9px; border-radius:6px; font-family:inherit;">
+      <option value="">Jump to client…</option>
+    </select>
+    <div class="client-list" id="clientList"></div>
+    <div class="side-foot">
+      Signed in as <span id="authedEmail"></span> · <span class="signout-link" id="signOutBtn" style="cursor:pointer; text-decoration:underline;">Sign out</span>
+      <div class="sync-status" id="syncStatus"><span class="sync-dot" id="syncDot"></span><span id="syncText">Idle</span></div>
+      <div style="margin-top:6px; color:#5b7bab;">Client roster is shared with Risk Modeling — clients added here appear there too, and vice versa.</div>
+    </div>
+
+    <div class="nav-divider"></div>
+    <div class="tool-switcher-label">Switch Tool</div>
+    <select class="tool-switcher" id="toolSwitcher">
+      <option value="">— Redmount Tools —</option>
+      <option value="https://redmountcurtis.github.io/Redmount-Terminal/">Terminal (Home)</option>
+      <option value="https://redmountcurtis.github.io/401k/">Fiduciary Monitor</option>
+      <option value="https://redmountcurtis.github.io/capital-stack-navigator/">Capital Stack Navigator</option>
+      <option value="https://redmountcurtis.github.io/risk-modeling/">Risk Modeling</option>
+      <option value="https://redmountcurtis.github.io/financial-plan/" selected disabled>Financial Plan (current)</option>
+      <option value="https://redmountcurtis.github.io/enterprise-capital-strategy/">Enterprise Capital Strategy</option>
+    </select>
+  </aside>
+
+  <main class="main" id="mainArea">
+    <div class="empty" style="margin-top:60px;">Add a client to get started.</div>
+  </main>
+</div>
+</div>
+<div id="printArea"></div>
+
+<script>
+// ==================== AUTH + PERSISTENCE ====================
+const SUPABASE_URL = 'https://pdympbpyavilstjsmjtm.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_2CogNhXWXa7phJfFPpxVgg_JEevv89Y';
+const AUTH_URL = SUPABASE_URL + '/auth/v1';
+const REST_URL = SUPABASE_URL + '/rest/v1';
+const SESSION_KEY = 'redmount_session'; // shared across all Redmount tools for single sign-on
+
+function $id(id){ return document.getElementById(id); }
+
+async function authSignIn(email, password){
+  const res = await fetch(AUTH_URL+'/token?grant_type=password', {
+    method:'POST', headers:{'apikey':SUPABASE_KEY, 'Content-Type':'application/json'},
+    body: JSON.stringify({email, password})
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error_description || data.msg || 'Incorrect email or password');
+  return data;
+}
+async function authRefresh(refreshToken){
+  const res = await fetch(AUTH_URL+'/token?grant_type=refresh_token', {
+    method:'POST', headers:{'apikey':SUPABASE_KEY, 'Content-Type':'application/json'},
+    body: JSON.stringify({refresh_token:refreshToken})
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error('refresh failed');
+  return data;
+}
+function saveSession(data){
+  const session = {access_token:data.access_token, refresh_token:data.refresh_token,
+    expires_at: Date.now() + (data.expires_in||3600)*1000, email: data.user && data.user.email};
+  try{ localStorage.setItem(SESSION_KEY, JSON.stringify(session)); }catch(e){}
+  return session;
+}
+function loadStoredSession(){
+  try{ const raw = localStorage.getItem(SESSION_KEY); return raw ? JSON.parse(raw) : null; }catch(e){ return null; }
+}
+function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+async function ensureValidSession(){
+  const session = loadStoredSession();
+  if(!session) return null;
+  if(Date.now() < session.expires_at - 60000) return session;
+  try{ const fresh = saveSession(await authRefresh(session.refresh_token)); return fresh; }
+  catch(e){ clearSession(); return null; }
+}
+
+async function supabaseFetch(path, options){
+  options = options || {};
+  const session = await ensureValidSession();
+  if(!session) throw new Error('Not signed in');
+  const headers = Object.assign({
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + session.access_token,
+    'Content-Type': 'application/json'
+  }, options.headers || {});
+  const res = await fetch(REST_URL + path, Object.assign({}, options, {headers}));
+  if(!res.ok){
+    const text = await res.text().catch(()=> '');
+    throw new Error('Supabase error ' + res.status + ': ' + text);
+  }
+  return res;
+}
+
+function setSyncStatus(state, text){
+  const dot = $id('syncDot'), label = $id('syncText');
+  if(!dot) return;
+  dot.className = 'sync-dot' + (state ? ' '+state : '');
+  label.textContent = text || (state==='saved' ? 'Saved' : state==='saving' ? 'Saving…' : state==='error' ? 'Error saving' : 'Idle');
+}
+
+function uid(prefix){ return (prefix||'id') + '_' + Math.random().toString(36).slice(2,10); }
+function esc(v){ return (v===null||v===undefined||v==='') ? '<span style="color:#bbb;">—</span>' : String(v); }
+function num(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+function fmt$(v, digits){ digits = digits===undefined?0:digits; return '$'+num(v).toLocaleString(undefined,{minimumFractionDigits:digits, maximumFractionDigits:digits}); }
+function fmtPct(v, digits){ digits = digits===undefined?1:digits; return num(v).toFixed(digits)+'%'; }
+
+// ---- Remote load: clients come from the SHARED risk_clients table; this tool's
+// own planning data lives in a separate financial_plans table keyed by client id. ----
+async function loadRemoteData(){
+  setSyncStatus('saving', 'Loading…');
+  try{
+    const [clientsRes, plansRes] = await Promise.all([
+      supabaseFetch('/risk_clients?select=id,payload,updated_at&order=updated_at.desc'),
+      supabaseFetch('/financial_plans?select=id,client_id,payload,updated_at')
+    ]);
+    const clientRows = await clientsRes.json();
+    const planRows = await plansRes.json();
+
+    sharedClients = clientRows.map(row => ({
+      id: row.id,
+      first: (row.payload && row.payload.client1 && row.payload.client1.first) || '',
+      last: (row.payload && row.payload.client1 && row.payload.client1.last) || '',
+      riskPayload: row.payload || {}
+    }));
+
+    plans = {};
+    planRemoteIds = {};
+    planRemoteUpdatedAt = {};
+    saveConflicts = {};
+    planRows.forEach(row => {
+      plans[row.client_id] = migratePlan(row.payload || {});
+      planRemoteIds[row.client_id] = row.id;
+      planRemoteUpdatedAt[row.client_id] = row.updated_at;
+      lastSavedHash[row.client_id] = JSON.stringify(plans[row.client_id]);
+    });
+    // Make sure every shared client has at least a blank in-memory plan, even if nothing saved yet.
+    sharedClients.forEach(sc => { if(!plans[sc.id]) plans[sc.id] = blankPlan(); });
+
+    activeId = sharedClients.length ? sharedClients[0].id : null;
+    setSyncStatus('saved', 'Synced');
+  }catch(e){
+    console.error(e);
+    setSyncStatus('error', 'Could not load — using local data');
+  }
+}
+
+// ---- Remote save (plan) ----
+// Uses optimistic concurrency on the financial_plans.updated_at column: the PATCH only applies if the
+// row hasn't changed remotely since we last read it. If someone else (or another tab) saved in the
+// meantime, we detect it instead of silently clobbering their edit.
+async function savePlanRemote(clientId, opts){
+  opts = opts || {};
+  setSyncStatus('saving');
+  try{
+    const payload = plans[clientId];
+    if(!planRemoteIds[clientId]){
+      const res = await supabaseFetch('/financial_plans', {
+        method:'POST',
+        headers:{'Prefer':'return=representation'},
+        body: JSON.stringify({client_id: clientId, payload})
+      });
+      const data = await res.json();
+      if(data && data[0]){ planRemoteIds[clientId] = data[0].id; planRemoteUpdatedAt[clientId] = data[0].updated_at; }
+    } else {
+      let path = '/financial_plans?id=eq.'+planRemoteIds[clientId];
+      if(!opts.force && planRemoteUpdatedAt[clientId]) path += '&updated_at=eq.'+encodeURIComponent(planRemoteUpdatedAt[clientId]);
+      const res = await supabaseFetch(path, {
+        method:'PATCH',
+        headers:{'Prefer':'return=representation'},
+        body: JSON.stringify({payload})
+      });
+      const data = await res.json();
+      if(!opts.force && (!data || data.length===0)){
+        // Nothing matched our expected updated_at — someone else changed this plan since we loaded it.
+        saveConflicts[clientId] = true;
+        if(clientId===activeId) renderConflictBanner();
+        setSyncStatus('error', 'Save conflict');
+        return;
+      }
+      if(data && data[0]) planRemoteUpdatedAt[clientId] = data[0].updated_at;
+    }
+    saveConflicts[clientId] = false;
+    if(clientId===activeId) renderConflictBanner();
+    lastSavedHash[clientId] = JSON.stringify(payload);
+    setSyncStatus('saved');
+  }catch(e){ console.error(e); setSyncStatus('error'); }
+}
+
+async function forceSavePlan(clientId){
+  const btn = $id('manualSaveBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Saving…'; }
+  try{
+    await savePlanRemote(clientId);
+    if(btn){ btn.textContent = 'Saved ✓'; setTimeout(()=>{ if($id('manualSaveBtn')){ $id('manualSaveBtn').textContent='Save'; $id('manualSaveBtn').disabled=false; } }, 1400); }
+  }catch(e){
+    console.error(e);
+    if(btn){ btn.textContent = 'Save failed — retry'; btn.disabled = false; }
+  }
+}
+
+// ---- Conflict resolution UI ----
+let saveConflicts = {};
+function renderConflictBanner(){
+  const wrap = $id('conflictBanner');
+  if(!wrap) return;
+  if(!activeId || !saveConflicts[activeId]){ wrap.innerHTML = ''; return; }
+  wrap.innerHTML = `<div class="note" style="background:var(--bad-bg); border-color:#efc6c6; color:var(--bad); display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap;">
+    <span><strong>This plan changed elsewhere</strong> since you loaded it (another tab or advisor saved a newer version). Reload to see the latest version, or overwrite it with what's on your screen now.</span>
+    <span style="display:flex; gap:8px;">
+      <button class="btn secondary compact" onclick="reloadClientFromServer('${activeId}')">Reload latest</button>
+      <button class="btn danger compact" onclick="overwriteConflict('${activeId}')">Overwrite with mine</button>
+    </span>
+  </div>`;
+}
+async function reloadClientFromServer(clientId){
+  try{
+    const res = await supabaseFetch('/financial_plans?client_id=eq.'+clientId+'&select=id,payload,updated_at');
+    const rows = await res.json();
+    if(rows && rows[0]){
+      plans[clientId] = migratePlan(rows[0].payload || {});
+      planRemoteIds[clientId] = rows[0].id;
+      planRemoteUpdatedAt[clientId] = rows[0].updated_at;
+      lastSavedHash[clientId] = JSON.stringify(plans[clientId]);
+    }
+    saveConflicts[clientId] = false;
+    renderAll();
+  }catch(e){ console.error(e); alert('Could not reload this plan: '+e.message); }
+}
+function overwriteConflict(clientId){
+  savePlanRemote(clientId, {force:true});
+}
+
+
+// New clients are written to the SHARED risk_clients table (so Risk Modeling sees
+// them too), with a minimal payload matching that tool's schema.
+async function createSharedClient(first, last){
+  const minimalRiskPayload = {
+    client1: {last:last||'', first:first||'', mi:'', status:'', employer:'', occupation:'', startDate:'', salary:''},
+    client2: {last:'', first:'', mi:'', status:'', employer:'', occupation:'', startDate:'', salary:''},
+    contact: {address:'', cityStateZip:'', phone:'', cell:'', email:''},
+    professionals: {cpa:'', attorney:'', other:''},
+    beneficiaries: [], age:'',
+    financial: {taxBracket:'', netWorth:'', liquidNetWorth:'', annualIncome:'', annualExpense:'', totalAssets:'', investableAssets:''},
+    household: {size:'', dependentsUnder18:'', healthStatus:'', incomeSector:'', ownsPropertyInZip:''},
+    questionnaire: {lossReaction:'', historicalBehavior:'', maxLossTolerance:'', gainFlipChoice:'', lossFlipChoice:'', incomeStability:'', experienceLevel:''},
+    goal: {description:'', targetAmount:'', years:'', annualContribution:''},
+    riskTolerance:'', objective:'', horizon:'', liquidityImportance:'', drawingFromHoldings:'no',
+    otherIncomeSources: [], otherIncomeOther:'', issuesForDiscussion: [], issuesOther:'',
+    recommendations:'', notes:'', accounts: [],
+    proposedScenarios: [{id: uid('sc'), name:'Scenario 1', holdings: []}],
+    activeScenarioId: null, reviewHistory: []
+  };
+  minimalRiskPayload.activeScenarioId = minimalRiskPayload.proposedScenarios[0].id;
+  const res = await supabaseFetch('/risk_clients', {
+    method:'POST',
+    headers:{'Prefer':'return=representation'},
+    body: JSON.stringify({payload: minimalRiskPayload})
+  });
+  const data = await res.json();
+  return data && data[0] ? data[0] : null;
+}
+
+// ---- Autosave loop: diff current plan state against last-saved snapshot every few seconds ----
+let lastSavedHash = {};
+function autosaveTick(){
+  Object.keys(plans).forEach(cid=>{
+    const json = JSON.stringify(plans[cid]);
+    if(lastSavedHash[cid] !== json){
+      lastSavedHash[cid] = json; // set immediately to avoid duplicate concurrent saves
+      savePlanRemote(cid);
+    }
+  });
+}
+setInterval(autosaveTick, 4000);
+window.addEventListener('beforeunload', autosaveTick);
+document.addEventListener('visibilitychange', ()=>{ if(document.hidden) autosaveTick(); });
+
+function enterApp(){
+  $id('authGate').style.display = 'none';
+  $id('mainApp').style.display = 'block';
+}
+
+$id('authSubmit') && $id('authSubmit').addEventListener('click', async function(){
+  const email = $id('authEmail').value.trim();
+  const password = $id('authPassword').value;
+  if(!email || !password){ showAuthErr('Enter an email and password.'); return; }
+  $id('authSubmit').disabled = true;
+  try{
+    const data = await authSignIn(email, password);
+    saveSession(data);
+    $id('authedEmail').textContent = data.user.email;
+    enterApp();
+    await loadRemoteData();
+    renderAll();
+  }catch(e){ showAuthErr(e.message || 'Incorrect email or password'); }
+  $id('authSubmit').disabled = false;
+});
+function showAuthErr(msg){ const el = $id('authErr'); el.textContent = msg; el.classList.add('show'); }
+
+document.addEventListener('DOMContentLoaded', function(){
+  const signOutBtn = $id('signOutBtn');
+  if(signOutBtn) signOutBtn.addEventListener('click', function(){
+    autosaveTick();
+    clearSession();
+    $id('mainApp').style.display = 'none';
+    $id('authGate').style.display = 'flex';
+    $id('authEmail').value=''; $id('authPassword').value='';
+    sharedClients = []; plans = {}; activeId = null; lastSavedHash = {}; planRemoteUpdatedAt = {}; saveConflicts = {};
+  });
+});
+
+async function tryAutoLogin(){
+  const session = await ensureValidSession();
+  if(!session) return;
+  $id('authedEmail').textContent = session.email || '';
+  enterApp();
+  await loadRemoteData();
+  renderAll();
+}
+
+// ==================== DATA MODEL ====================
+let sharedClients = [];   // from risk_clients — the shared roster
+let plans = {};           // clientId -> plan payload (this tool's own data)
+let planRemoteIds = {};   // clientId -> financial_plans.id
+let planRemoteUpdatedAt = {}; // clientId -> financial_plans.updated_at (optimistic concurrency)
+let activeId = null;
+let activeTab = 'household';
+let clientSearchQuery = '';
+let whatIf = { retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0 }; // reset per client view
+let stressTestSelection = 'gfc2008';
+
+function blankPlan(){
+  return {
+    household: {
+      client1: {first:'', last:'', dob:'', retireAge:65, lifeExpectancy:92},
+      client2: {first:'', last:'', dob:'', retireAge:65, lifeExpectancy:92},
+      hasClient2:false, filingStatus:'', dependents:0,
+      riskToleranceLabel:'', riskToleranceScore:''
+    },
+    netWorth: {
+      assets: [],      // {id,name,category,value}
+      liabilities: []  // {id,name,category,balance,rate}
+    },
+    cashFlow: {
+      income: [],      // {id,name,amount,freq:'annual'|'monthly',owner:'client1'|'client2'|'joint'}
+      expenses: []      // {id,name,amount,freq:'annual'|'monthly',essential:bool}
+    },
+    goals: [], // {id,name,type,priority:'need'|'want'|'wish',targetYear,amountToday,fundedFromPortfolio:bool}
+    assumptions: {
+      inflationRate:2.8,
+      desiredRetirementSpending:'', currentPortfolioOverride:'',
+      displayMode: 'nominal', // 'nominal' | 'real' — how projected dollars are shown (sim always runs nominal)
+      // Capital market assumptions by asset class (nominal, arithmetic-mean-targeted; engine converts to
+      // lognormal per-year draws). Editable so the plan can be re-run against the firm's current CMAs.
+      capitalMarket: {
+        equityReturn:9.5, equityVol:17.0,
+        bondReturn:4.5,  bondVol:6.0,
+        cashReturn:2.6,  cashVol:1.0
+      },
+      // Glide path: equity weight (%) starts at equityPre and glides linearly down to equityPost over
+      // glideYears immediately preceding retirement, then holds at equityPost through the retirement horizon.
+      assetAllocation: { equityPre:75, equityPost:45, glideYears:10 },
+      // Simplified Guyton-Klinger-style guardrails. When enabled, retirement spending is nudged based on
+      // how the current withdrawal rate compares to the plan's initial target withdrawal rate.
+      guardrails: { enabled:false, cutTriggerPct:20, cutAmountPct:10, raiseTriggerPct:20, raiseAmountPct:10 },
+      // Optional flat effective tax drag applied to portfolio withdrawals in retirement (0 = ignore taxes).
+      effectiveTaxRate: 0,
+      // Required Minimum Distributions: once age 73 is reached, if planned spending withdrawals fall short
+      // of the IRS-required distribution on the tax-deferred (Retirement-category) share of the portfolio,
+      // the shortfall is treated as a forced taxable event at rmdTaxRate (money already in the aggregate
+      // portfolio isn't removed — only the incremental tax cost of being forced to distribute it is modeled).
+      rmd: { enabled:true, taxRate:22 },
+      // Healthcare cost bridge from today's coverage through Medicare eligibility. Additive on top of the
+      // desired retirement spending figure; its own inflation rate defaults higher than general CPI.
+      healthcareBridge: { enabled:false, preMedicareAnnual:18000, medicareAnnual:6500, medicareStartAge:65, inflationRate:5.5 },
+      // Long-term-care stress event: an additional cost window layered on top of normal retirement spending.
+      ltcEvent: { enabled:false, onsetAge:82, durationYears:3, annualCost:95000 },
+      // Survivor scenario: one spouse's death mid-plan — SS survivor step-up, deceased pension stops, a
+      // life-insurance lump sum, and a step-down in ongoing spending.
+      survivorEvent: { enabled:false, deathOwner:'client1', deathAge:80, spendingFactor:75, lifeInsuranceProceeds:0 }
+    },
+    socialSecurity: {
+      pia1:'', fra1:67, pia2:'', fra2:67, claimAge1:67, claimAge2:67
+    },
+    pensions: [], // {id,owner,monthlyAmount,startAge,cola:bool}
+    insurance: {
+      life1: {incomeReplaceYears:10, existingCoverage:'', finalExpenses:15000, debtPayoff:'', eduFundGoal:''},
+      life2: {incomeReplaceYears:10, existingCoverage:'', finalExpenses:15000, debtPayoff:'', eduFundGoal:''},
+      disability1: {monthlyExpenses:'', existingBenefit:''},
+      disability2: {monthlyExpenses:'', existingBenefit:''}
+    },
+    education: [], // {id,name,currentAge,collegeAge,yearsInCollege,currentCostPerYear,inflationRate,currentSavings,monthlyContribution}
+    monteCarlo: { trials:1000, seed: Math.floor(Math.random()*1e9) },
+    scenarios: [],      // saved named snapshots for side-by-side comparison — {id,name,createdAt,assumptions,whatIf,result}
+    reportHistory: [],  // audit trail of delivered PDFs — {id,ts,successRate,medianEndingBalance,assumptionsSnapshot}
+    auditLog: [],       // {ts,user,path,oldVal,newVal} for key assumption/timeline fields
+    notes: ''
+  };
+}
+
+function migratePlan(p){
+  const b = blankPlan();
+  function merge(target, src){
+    Object.keys(target).forEach(k=>{
+      if(src && src[k]!==undefined){
+        if(Array.isArray(target[k])){ target[k] = Array.isArray(src[k]) ? src[k] : target[k]; }
+        else if(typeof target[k]==='object' && target[k]!==null){ merge(target[k], src[k]); }
+        else{ target[k] = src[k]; }
+      }
+    });
+  }
+  merge(b, p);
+  return b;
+}
+
+function getSharedClient(id){ return sharedClients.find(c=>c.id===id); }
+function getPlan(id){ return plans[id]; }
+function clientName(sc){ return (sc.first || sc.last) ? `${sc.first} ${sc.last}`.trim() : 'New client'; }
+
+async function addClient(){
+  const first = prompt('Client first name?');
+  if(first===null) return;
+  const last = prompt('Client last name?') || '';
+  try{
+    const row = await createSharedClient(first.trim(), last.trim());
+    if(row){
+      sharedClients.unshift({id:row.id, first:first.trim(), last:last.trim(), riskPayload: row.payload || {}});
+      plans[row.id] = blankPlan();
+      plans[row.id].household.client1.first = first.trim();
+      plans[row.id].household.client1.last = last.trim();
+      activeId = row.id;
+      activeTab = 'household';
+      renderAll();
+      forceSavePlan(row.id);
+    }
+  }catch(e){ console.error(e); alert('Could not create client: ' + e.message); }
+}
+
+function setClientSearch(q){ clientSearchQuery = q; renderClientList(); }
+function selectClient(id){ activeId = id; activeTab = 'household'; whatIf = {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}; stressTestSelection = 'gfc2008'; renderAll(); }
+function setTab(t){ activeTab = t; renderMain(); }
+
+function renderClientList(){
+  const wrap = $id('clientList');
+  if(!wrap) return;
+  const q = (clientSearchQuery||'').trim().toLowerCase();
+  const filtered = q ? sharedClients.filter(sc => clientName(sc).toLowerCase().includes(q)) : sharedClients;
+
+  const dd = $id('clientDropdown');
+  if(dd){
+    const sorted = [...sharedClients].sort((a,b)=>clientName(a).localeCompare(clientName(b)));
+    dd.innerHTML = `<option value="">Jump to client…</option>` + sorted.map(sc=>
+      `<option value="${sc.id}" ${sc.id===activeId?'selected':''}>${clientName(sc)}</option>`).join('');
+  }
+
+  if(sharedClients.length===0){ wrap.innerHTML = ''; return; }
+  if(filtered.length===0){ wrap.innerHTML = '<div style="font-size:11.5px; color:#7d92b8; padding:6px 10px;">No matches.</div>'; return; }
+  wrap.innerHTML = filtered.map(sc=>{
+    const plan = getPlan(sc.id);
+    const pos = plan ? monteCarloResult(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}, 200).successRate : null;
+    let dotColor = '#5b6b82';
+    if(pos!==null){ dotColor = pos>=80 ? '#3ecf8e' : pos>=60 ? '#e0a83f' : '#e06767'; }
+    return `<div class="client-item ${sc.id===activeId?'active':''}" onclick="selectClient('${sc.id}')">
+      <span>${clientName(sc)}</span><span class="gapdot" style="background:${dotColor}"></span>
+    </div>`;
+  }).join('');
+}
+
+function renderAll(){ renderClientList(); renderMain(); }
+
+// ==================== CALCULATION ENGINES ====================
+
+// ---- Net worth ----
+const ASSET_CATEGORIES = ['Investment','Retirement','Cash','Real Estate','Business','Other'];
+const LIABILITY_CATEGORIES = ['Mortgage','Auto Loan','Student Loan','Credit Card','Other'];
+
+function netWorthTotals(plan){
+  const assets = plan.netWorth.assets.reduce((s,a)=>s+num(a.value),0);
+  const liabilities = plan.netWorth.liabilities.reduce((s,l)=>s+num(l.balance),0);
+  return { assets, liabilities, net: assets - liabilities };
+}
+function investablePortfolioValue(plan){
+  if(plan.assumptions.currentPortfolioOverride!=='' && plan.assumptions.currentPortfolioOverride!==null && plan.assumptions.currentPortfolioOverride!==undefined){
+    return num(plan.assumptions.currentPortfolioOverride);
+  }
+  return plan.netWorth.assets.filter(a=>a.category==='Investment'||a.category==='Retirement').reduce((s,a)=>s+num(a.value),0);
+}
+
+// ---- Cash flow ----
+function annualize(amount, freq){ return freq==='monthly' ? num(amount)*12 : num(amount); }
+function cashFlowTotals(plan){
+  const income = plan.cashFlow.income.reduce((s,i)=>s+annualize(i.amount,i.freq),0);
+  const expenses = plan.cashFlow.expenses.reduce((s,e)=>s+annualize(e.amount,e.freq),0);
+  return { income, expenses, net: income - expenses };
+}
+
+// ---- Ages / timeline ----
+function ageFromDOB(dob){
+  if(!dob) return null;
+  const d = new Date(dob);
+  if(isNaN(d.getTime())) return null;
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if(m < 0 || (m===0 && now.getDate() < d.getDate())) age--;
+  return age;
+}
+function currentAge1(plan){ return ageFromDOB(plan.household.client1.dob) || 0; }
+function currentAge2(plan){ return plan.household.hasClient2 ? (ageFromDOB(plan.household.client2.dob) || 0) : null; }
+
+// ---- Social Security ----
+function ssBenefitAtAge(pia, fra, claimAge){
+  pia = num(pia); fra = num(fra)||67; claimAge = num(claimAge);
+  if(!pia) return 0;
+  const monthsFromFRA = Math.round((claimAge - fra) * 12);
+  if(monthsFromFRA === 0) return pia;
+  if(monthsFromFRA < 0){
+    const monthsEarly = Math.min(-monthsFromFRA, (fra-62)*12);
+    const first36 = Math.min(36, monthsEarly);
+    const beyond36 = Math.max(0, monthsEarly-36);
+    const reduction = first36*(5/9/100) + beyond36*(5/12/100);
+    return pia*(1-reduction);
+  } else {
+    const monthsLate = Math.min(monthsFromFRA, (70-fra)*12);
+    const increase = monthsLate*(2/3/100);
+    return pia*(1+increase);
+  }
+}
+function ssComparisonTable(pia, fra){
+  const ages = [62,63,64,65,66,67,68,69,70].filter(a=>a>=62 && a<=70);
+  return ages.map(a=>({age:a, monthly: ssBenefitAtAge(pia,fra,a), annual: ssBenefitAtAge(pia,fra,a)*12}));
+}
+function ssBreakevenAge(pia, fra, earlyAge, lateAge){
+  const earlyMonthly = ssBenefitAtAge(pia,fra,earlyAge);
+  const lateMonthly = ssBenefitAtAge(pia,fra,lateAge);
+  if(lateMonthly<=earlyMonthly) return null;
+  // Cumulative dollars: find age where late-claim cumulative catches up to early-claim cumulative.
+  let earlyCum = 0, lateCum = 0;
+  for(let age=earlyAge; age<=100; age += (1/12)){
+    earlyCum += earlyMonthly;
+    lateCum += (age>=lateAge) ? lateMonthly : 0;
+    if(lateCum >= earlyCum && age > lateAge) return Math.round(age*10)/10;
+  }
+  return null;
+}
+
+// ---- Monte Carlo retirement projection ----
+// Multi-asset-class (equity/bond/cash) engine with a glide path from the pre-retirement
+// allocation to the post-retirement allocation, correlated annual returns drawn from a true
+// lognormal distribution (so real compounding never goes below -100% in a single year), guaranteed
+// income (Social Security / pensions) that turns on in the actual year it starts rather than at
+// retirement, optional Guyton-Klinger-style spending guardrails, an optional flat tax drag on
+// portfolio withdrawals, and a seeded PRNG so re-opening the same plan reproduces the same result
+// until the advisor deliberately reshuffles. This is an illustrative planning tool — not a full
+// tax-lot, Roth-conversion, or estate-aware retirement engine.
+function mulberry32(seed){
+  let a = seed >>> 0;
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function hashSeed(str){
+  let h = 1779033703 ^ String(str||'').length;
+  for(let i=0;i<String(str||'').length;i++){
+    h = Math.imul(h ^ String(str).charCodeAt(i), 3432918353);
+    h = (h << 13) | (h >>> 19);
+  }
+  return (h >>> 0);
+}
+function boxMullerNormal(rng){
+  rng = rng || Math.random;
+  let u=0, v=0;
+  while(u===0) u = rng();
+  while(v===0) v = rng();
+  return Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+}
+// Correlated lognormal draws for equity/bond/cash in a single year, using a one-factor market
+// model (shared systematic shock + asset-specific idiosyncratic shock). Loadings approximate
+// typical long-run equity/bond/cash correlation without requiring a full covariance matrix.
+const ASSET_CORR_LOAD = { equity:0.90, bond:-0.20, cash:0.05 };
+function drawAssetReturns(rng, cm){
+  const marketFactor = boxMullerNormal(rng);
+  const draw = (mu, sigma, load) => {
+    const idio = boxMullerNormal(rng);
+    const z = load*marketFactor + Math.sqrt(Math.max(0,1-load*load))*idio;
+    const sigmaLog = Math.sqrt(Math.log(1 + (sigma*sigma)/((1+mu)*(1+mu))));
+    const muLog = Math.log(1+mu) - 0.5*sigmaLog*sigmaLog;
+    return Math.exp(muLog + sigmaLog*z) - 1;
+  };
+  return {
+    equity: draw(num(cm.equityReturn)/100, num(cm.equityVol)/100, ASSET_CORR_LOAD.equity),
+    bond:   draw(num(cm.bondReturn)/100,   num(cm.bondVol)/100,   ASSET_CORR_LOAD.bond),
+    cash:   draw(num(cm.cashReturn)/100,   num(cm.cashVol)/100,   ASSET_CORR_LOAD.cash)
+  };
+}
+// Equity weight for a given simulation year, gliding from equityPre down/up to equityPost
+// over the glideYears immediately before retirement, then holding at equityPost thereafter.
+function glideEquityWeight(y, yearsToRetire, alloc){
+  const pre = num(alloc.equityPre)/100, post = num(alloc.equityPost)/100;
+  const glideYears = Math.max(0, num(alloc.glideYears));
+  const yearsUntilRetire = yearsToRetire - y;
+  if(yearsUntilRetire <= 0) return post;
+  if(glideYears<=0 || yearsUntilRetire >= glideYears) return pre;
+  const frac = 1 - (yearsUntilRetire/glideYears); // 0 at glide start -> 1 at retirement
+  return pre + (post-pre)*frac;
+}
+function guaranteedIncomeForYear(plan, age1, age2, survivorState){
+  let g = 0;
+  const ss = plan.socialSecurity;
+  const ss1Active = ss.pia1 && age1!==null && age1 >= num(ss.claimAge1);
+  const ss2Active = plan.household.hasClient2 && ss.pia2 && age2!==null && age2 >= num(ss.claimAge2);
+  const ss1Amt = ss1Active ? ssBenefitAtAge(ss.pia1, ss.fra1, ss.claimAge1) * 12 : 0;
+  const ss2Amt = ss2Active ? ssBenefitAtAge(ss.pia2, ss.fra2, ss.claimAge2) * 12 : 0;
+  if(survivorState && survivorState.deceasedOwner){
+    // Simplified survivor-benefit rule: the surviving spouse steps up to the larger of the two benefits
+    // rather than losing the deceased's check outright.
+    g += Math.max(ss1Amt, ss2Amt);
+  } else {
+    g += ss1Amt + ss2Amt;
+  }
+  (plan.pensions||[]).forEach(p=>{
+    if(survivorState && survivorState.deceasedOwner===p.owner) return; // simplified: pension stops at owner's death
+    const ownerAge = p.owner==='client2' ? age2 : age1;
+    if(ownerAge!==null && ownerAge >= num(p.startAge)) g += num(p.monthlyAmount)*12;
+  });
+  return g;
+}
+
+// IRS Uniform Lifetime Table (2022+), simplified/rounded — used only to approximate RMD magnitude.
+const RMD_DIVISORS = {73:26.5,74:25.5,75:24.6,76:23.7,77:22.9,78:22.0,79:21.1,80:20.2,81:19.4,82:18.5,83:17.7,84:16.8,85:16.0,86:15.2,87:14.4,88:13.7,89:12.9,90:12.2,91:11.5,92:10.8,93:10.1,94:9.5,95:8.9,96:8.4,97:7.8,98:7.3,99:6.8,100:6.4};
+function rmdDivisor(age){
+  const a = Math.max(73, Math.min(100, Math.round(age)));
+  return RMD_DIVISORS[a] || 6.4;
+}
+function retirementAssetFraction(plan){
+  if(plan.assumptions.currentPortfolioOverride!=='' && plan.assumptions.currentPortfolioOverride!==null && plan.assumptions.currentPortfolioOverride!==undefined) return 0; // composition unknown when overridden
+  const retireAssets = plan.netWorth.assets.filter(a=>a.category==='Retirement').reduce((s,a)=>s+num(a.value),0);
+  const investAssets = plan.netWorth.assets.filter(a=>a.category==='Investment').reduce((s,a)=>s+num(a.value),0);
+  const total = retireAssets+investAssets;
+  return total>0 ? retireAssets/total : 0;
+}
+
+function monteCarloResult(plan, wi, trialsOverride, opts){
+  wi = wi || {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0};
+  opts = opts || {};
+  const a1 = currentAge1(plan);
+  const a2 = currentAge2(plan);
+  const life1 = num(plan.household.client1.lifeExpectancy) || 92;
+  const retireAge1 = (num(plan.household.client1.retireAge) || 65) + num(wi.retireAgeDelta);
+  const yearsToRetire = Math.max(0, retireAge1 - a1);
+  const yearsInRetirement = Math.max(0, life1 - retireAge1);
+  const totalYears = Math.round(yearsToRetire + yearsInRetirement);
+  if(totalYears<=0 || a1<=0) return {successRate:null, medianEndingBalance:null, yearsToRetire, yearsInRetirement, trials:0};
+
+  const startingPortfolio = investablePortfolioValue(plan);
+  const cf = cashFlowTotals(plan);
+  const annualSavings = Math.max(0, cf.net) * (num(wi.savingsPct)/100);
+  const desiredSpend = plan.assumptions.desiredRetirementSpending!=='' && plan.assumptions.desiredRetirementSpending!==null
+    ? num(plan.assumptions.desiredRetirementSpending)
+    : Math.max(0, cf.expenses);
+  const baseRetirementSpend = desiredSpend * (num(wi.spendingPct)/100);
+
+  const inflation = num(plan.assumptions.inflationRate)/100;
+  const returnDelta = num(wi.returnDelta)/100;
+  const cm = plan.assumptions.capitalMarket || {equityReturn:9.5,equityVol:17,bondReturn:4.5,bondVol:6,cashReturn:2.6,cashVol:1};
+  const cmAdj = { equityReturn: num(cm.equityReturn)+returnDelta*100, equityVol: num(cm.equityVol),
+                  bondReturn: num(cm.bondReturn)+returnDelta*100, bondVol: num(cm.bondVol),
+                  cashReturn: num(cm.cashReturn)+returnDelta*100, cashVol: num(cm.cashVol) };
+  const alloc = plan.assumptions.assetAllocation || {equityPre:75, equityPost:45, glideYears:10};
+  const guardrails = plan.assumptions.guardrails || {enabled:false, cutTriggerPct:20, cutAmountPct:10, raiseTriggerPct:20, raiseAmountPct:10};
+  const taxRate = Math.min(0.6, Math.max(0, num(plan.assumptions.effectiveTaxRate)/100));
+
+  const rmd = plan.assumptions.rmd || {enabled:true, taxRate:22};
+  const rmdFraction = rmd.enabled ? retirementAssetFraction(plan) : 0;
+  const rmdTaxRate = Math.min(0.5, Math.max(0, num(rmd.taxRate)/100));
+
+  const hc = plan.assumptions.healthcareBridge || {enabled:false};
+  const hcInflation = num(hc.inflationRate)/100 || inflation;
+
+  const ltc = (opts.ltcEvent!==undefined ? opts.ltcEvent : plan.assumptions.ltcEvent) || {enabled:false};
+
+  const survivor = (opts.survivorEvent!==undefined ? opts.survivorEvent : plan.assumptions.survivorEvent) || {enabled:false};
+
+  const lumpGoalsByYear = {};
+  (plan.goals||[]).forEach(goal=>{
+    if(!goal.fundedFromPortfolio) return;
+    const yearsOut = num(goal.targetYear) - new Date().getFullYear();
+    if(yearsOut>=0 && yearsOut<=totalYears){
+      lumpGoalsByYear[yearsOut] = (lumpGoalsByYear[yearsOut]||0) + num(goal.amountToday) * Math.pow(1+inflation, yearsOut);
+    }
+  });
+
+  const N = Math.max(1, trialsOverride || (plan.monteCarlo && plan.monteCarlo.trials) || 1000);
+  const seedBase = opts.seed!==undefined ? opts.seed : ((plan.monteCarlo && plan.monteCarlo.seed) || 42);
+  const storePaths = !!opts.storePaths;
+  const paths = storePaths ? Array.from({length: totalYears+1}, ()=>[]) : null;
+  const reportProgress = !!opts.reportProgress && typeof importScripts === 'function';
+  const progressStep = Math.max(1, Math.floor(N/20));
+
+  let successes = 0;
+  const endingBalances = [];
+  for(let t=0; t<N; t++){
+    const rng = mulberry32((seedBase + t*2654435761) >>> 0);
+    let bal = startingPortfolio;
+    let failed = false;
+    let spend = baseRetirementSpend;
+    let save = annualSavings;
+    let targetWithdrawalRate = null;
+    let survivorState = null;
+    let preMedCost = num(hc.preMedicareAnnual)||0, medCost = num(hc.medicareAnnual)||0;
+    let ltcYearsRemaining = 0, ltcCostToday = num(ltc.annualCost)||0;
+    if(storePaths) paths[0].push(bal);
+    for(let y=0; y<totalYears; y++){
+      const inRetirement = y >= yearsToRetire;
+      const ew = glideEquityWeight(y, yearsToRetire, alloc);
+      const remaining = 1 - ew;
+      const bw = remaining * 0.75, cw = remaining * 0.25; // within fixed-income sleeve: 75% bond / 25% cash
+      const r = drawAssetReturns(rng, cmAdj);
+      const blendedReturn = ew*r.equity + bw*r.bond + cw*r.cash;
+      bal *= (1+blendedReturn);
+
+      const age1y = a1 + y + 1, age2y = a2!==null ? a2 + y + 1 : null;
+
+      // Survivor event: triggers once, on the year the chosen owner reaches the specified death age.
+      if(survivor.enabled && !survivorState){
+        const ownerAge = survivor.deathOwner==='client2' ? age2y : age1y;
+        if(ownerAge!==null && ownerAge >= num(survivor.deathAge)){
+          survivorState = { deceasedOwner: survivor.deathOwner };
+          bal += Math.max(0, num(survivor.lifeInsuranceProceeds));
+          spend *= (num(survivor.spendingFactor)||75)/100;
+        }
+      }
+
+      const guaranteed = guaranteedIncomeForYear(plan, age1y, age2y, survivorState);
+
+      if(inRetirement){
+        if(y===yearsToRetire && bal>0) targetWithdrawalRate = Math.max(0, (spend-guaranteed))/bal;
+        if(guardrails.enabled && targetWithdrawalRate){
+          const curRate = bal>0 ? Math.max(0,(spend-guaranteed))/bal : 999;
+          if(curRate > targetWithdrawalRate*(1+num(guardrails.cutTriggerPct)/100)) spend *= (1 - num(guardrails.cutAmountPct)/100);
+          else if(curRate < targetWithdrawalRate*(1-num(guardrails.raiseTriggerPct)/100)) spend *= (1 + num(guardrails.raiseAmountPct)/100);
+        }
+
+        let effectiveSpend = spend;
+        if(hc.enabled) effectiveSpend += (age1y < num(hc.medicareStartAge) ? preMedCost : medCost);
+        if(ltc.enabled){
+          if(ltcYearsRemaining<=0 && age1y >= num(ltc.onsetAge) && age1y < num(ltc.onsetAge)+num(ltc.durationYears)){
+            ltcYearsRemaining = num(ltc.durationYears) - (age1y - num(ltc.onsetAge));
+          }
+          if(ltcYearsRemaining>0){ effectiveSpend += ltcCostToday; ltcYearsRemaining--; }
+        }
+
+        const grossNeed = Math.max(0, effectiveSpend - guaranteed);
+        let need = taxRate>0 ? grossNeed/(1-taxRate) : grossNeed;
+
+        // RMD: if age 73+ and the planned withdrawal is less than the required distribution on the
+        // tax-deferred share of the portfolio, the shortfall still triggers a taxable event.
+        if(rmd.enabled && rmdFraction>0 && age1y>=73 && bal>0){
+          const rmdAmount = (rmdFraction*bal) / rmdDivisor(age1y);
+          if(rmdAmount > grossNeed) need += (rmdAmount-grossNeed) * rmdTaxRate;
+        }
+
+        bal -= need;
+      } else {
+        bal += save;
+      }
+      if(lumpGoalsByYear[y]) bal -= lumpGoalsByYear[y];
+      if(bal < 0){ bal = 0; failed = true; }
+      spend *= (1+inflation);
+      save *= (1+inflation);
+      preMedCost *= (1+hcInflation); medCost *= (1+hcInflation);
+      if(storePaths) paths[y+1].push(bal);
+    }
+    if(!failed) successes++;
+    endingBalances.push(bal);
+    if(reportProgress && (t % progressStep === 0 || t===N-1)) postMessage({type:'progress', done:t+1, total:N});
+  }
+  endingBalances.sort((x,y)=>x-y);
+  const pct = (arr, p) => arr.length ? arr[Math.min(arr.length-1, Math.floor(p*arr.length))] : 0;
+  const median = pct(endingBalances, 0.5);
+
+  let percentiles = null;
+  if(storePaths){
+    percentiles = paths.map(yearVals=>{
+      const sorted = [...yearVals].sort((x,y)=>x-y);
+      return { p10:pct(sorted,0.10), p25:pct(sorted,0.25), p50:pct(sorted,0.50), p75:pct(sorted,0.75), p90:pct(sorted,0.90) };
+    });
+  }
+
+  return {
+    successRate: Math.round((successes/N)*1000)/10,
+    medianEndingBalance: median,
+    yearsToRetire, yearsInRetirement, trials:N,
+    retirementSpend: baseRetirementSpend, annualSavings, startingPortfolio,
+    guaranteed: guaranteedIncomeForYear(plan, retireAge1, plan.household.hasClient2 ? (a2!==null ? a2 + yearsToRetire : null) : null),
+    percentiles
+  };
+}
+
+// ---- Input validation ----
+// Returns a list of {level:'error'|'warn', msg} for timeline inputs that would otherwise silently
+// produce nonsense (0-year horizons, negative ages, retiring before you're born, etc).
+function validatePlan(plan){
+  const issues = [];
+  const h = plan.household;
+  const today = new Date();
+  const check1 = h.client1.dob ? new Date(h.client1.dob) : null;
+  if(h.client1.dob && (isNaN(check1.getTime()) || check1 > today)) issues.push({level:'error', msg:'Client 1 date of birth is invalid or in the future.'});
+  const a1 = currentAge1(plan);
+  if(h.client1.dob && a1!==null){
+    if(num(h.client1.retireAge) <= a1) issues.push({level:'warn', msg:`Client 1's planned retirement age (${h.client1.retireAge}) is at or before their current age (${a1}) — the projection will treat them as already retired.`});
+    if(num(h.client1.lifeExpectancy) <= num(h.client1.retireAge)) issues.push({level:'error', msg:`Client 1's life expectancy (${h.client1.lifeExpectancy}) is at or before their planned retirement age (${h.client1.retireAge}) — there's no retirement horizon to simulate.`});
+  }
+  if(h.hasClient2){
+    const check2 = h.client2.dob ? new Date(h.client2.dob) : null;
+    if(h.client2.dob && (isNaN(check2.getTime()) || check2 > today)) issues.push({level:'error', msg:'Client 2 date of birth is invalid or in the future.'});
+    const a2 = currentAge2(plan);
+    if(h.client2.dob && a2!==null && num(h.client2.lifeExpectancy) <= num(h.client2.retireAge)){
+      issues.push({level:'warn', msg:`Client 2's life expectancy (${h.client2.lifeExpectancy}) is at or before their planned retirement age (${h.client2.retireAge}).`});
+    }
+  }
+  if(plan.assumptions.inflationRate!=='' && num(plan.assumptions.inflationRate) < 0) issues.push({level:'warn', msg:'Inflation rate is negative — double-check this is intentional.'});
+  const trials = num(plan.monteCarlo.trials);
+  if(trials>0 && trials<250) issues.push({level:'warn', msg:`Simulation trials (${trials}) is quite low — results may be noisy. 500–2,000 is a reasonable range.`});
+  if(trials>5000) issues.push({level:'warn', msg:`Simulation trials (${trials}) is very high and may be slow to compute. 1,000–2,500 is usually sufficient.`});
+  return issues;
+}
+function validationBannerHTML(plan){
+  const issues = validatePlan(plan);
+  if(!issues.length) return '';
+  return `<div class="panel" style="border-color:${issues.some(i=>i.level==='error')?'#efc6c6':'#f0dcaa'};">
+    <h2 style="color:${issues.some(i=>i.level==='error')?'var(--bad)':'var(--warn)'};">Plan Data Check</h2>
+    ${issues.map(i=>`<div class="note" style="${i.level==='error'?'background:var(--bad-bg); border-color:#efc6c6; color:var(--bad);':''} margin-bottom:8px;">${esc(i.msg)}</div>`).join('')}
+  </div>`;
+}
+
+// ---- Display-mode dollar conversion (nominal vs today's dollars) ----
+// The simulation always runs in nominal dollars internally for correctness; this only affects display.
+function toDisplayDollars(nominalValue, yearsFromNow, inflation, mode){
+  if(mode!=='real') return nominalValue;
+  return nominalValue / Math.pow(1+inflation, Math.max(0,yearsFromNow));
+}
+function deflatePercentiles(percentiles, inflation, mode){
+  if(mode!=='real' || !percentiles) return percentiles;
+  return percentiles.map((p,i)=>({
+    p10: toDisplayDollars(p.p10,i,inflation,mode), p25: toDisplayDollars(p.p25,i,inflation,mode),
+    p50: toDisplayDollars(p.p50,i,inflation,mode), p75: toDisplayDollars(p.p75,i,inflation,mode),
+    p90: toDisplayDollars(p.p90,i,inflation,mode)
+  }));
+}
+
+// ---- Goal-funding waterfall: how much does success rate improve if lower-priority goals are cut? ----
+function goalWaterfallAnalysis(plan){
+  if(!(plan.goals||[]).some(g=>g.fundedFromPortfolio)) return null;
+  const stages = [
+    {label:'All goals funded', filter: ()=>true},
+    {label:'Skip "wish" goals', filter: g=>g.priority!=='wish'},
+    {label:'Skip "wish" and "want" goals', filter: g=>g.priority==='need'}
+  ];
+  return stages.map(stage=>{
+    const cloned = JSON.parse(JSON.stringify(plan));
+    cloned.goals = cloned.goals.map(g => stage.filter(g) ? g : Object.assign({}, g, {fundedFromPortfolio:false}));
+    const r = monteCarloResult(cloned, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}, 400, {seed: (plan.monteCarlo&&plan.monteCarlo.seed)||42});
+    return { label: stage.label, successRate: r.successRate, medianEndingBalance: r.medianEndingBalance };
+  });
+}
+
+// ---- Risk-tolerance sanity check ----
+const RISK_EQUITY_RANGES = { Conservative:[15,40], Moderate:[35,65], Aggressive:[60,90] };
+function riskToleranceMismatch(plan){
+  const label = plan.household.riskToleranceLabel;
+  const range = RISK_EQUITY_RANGES[label];
+  if(!range) return null;
+  const eq = num(plan.assumptions.assetAllocation.equityPre);
+  if(eq < range[0] || eq > range[1]){
+    return `Pre-retirement equity weight (${eq}%) falls outside the typical range for a self-identified "${label}" investor (${range[0]}–${range[1]}%). Worth revisiting the glide path or confirming risk tolerance with the client.`;
+  }
+  return null;
+}
+
+// ---- Web Worker: run Monte Carlo off the main thread so the UI never freezes ----
+// The worker source is assembled from the actual engine functions via toString(), so there is a
+// single source of truth for the math — nothing is hand-duplicated between main thread and worker.
+function buildMonteCarloWorkerSource(){
+  const fns = [num, mulberry32, hashSeed, boxMullerNormal, drawAssetReturns, glideEquityWeight,
+    guaranteedIncomeForYear, rmdDivisor, retirementAssetFraction, ageFromDOB, currentAge1, currentAge2,
+    annualize, cashFlowTotals, netWorthTotals, investablePortfolioValue, ssBenefitAtAge, monteCarloResult]
+    .map(f=>f.toString()).join('\n\n');
+  return fns + `
+const RMD_DIVISORS = ${JSON.stringify(RMD_DIVISORS)};
+const ASSET_CORR_LOAD = ${JSON.stringify(ASSET_CORR_LOAD)};
+self.onmessage = function(e){
+  const {plan, wi, trials, opts} = e.data;
+  try{
+    const result = monteCarloResult(plan, wi, trials, Object.assign({}, opts, {reportProgress:true}));
+    postMessage({type:'done', result});
+  }catch(err){
+    postMessage({type:'error', message: (err && err.message) || String(err)});
+  }
+};`;
+}
+function runMonteCarloAsync(plan, wi, trials, opts){
+  opts = opts || {};
+  return new Promise((resolve)=>{
+    let settled = false;
+    const finish = (result) => { if(!settled){ settled=true; resolve(result); } };
+    try{
+      if(typeof Worker === 'undefined') throw new Error('Worker unsupported');
+      const src = buildMonteCarloWorkerSource();
+      const blob = new Blob([src], {type:'application/javascript'});
+      const url = URL.createObjectURL(blob);
+      const worker = new Worker(url);
+      const cleanup = () => { try{ worker.terminate(); URL.revokeObjectURL(url); }catch(e){} };
+      worker.onmessage = (e)=>{
+        if(e.data.type==='progress'){ if(opts.onProgress) opts.onProgress(e.data.done, e.data.total); }
+        else if(e.data.type==='done'){ cleanup(); finish(e.data.result); }
+        else if(e.data.type==='error'){ cleanup(); finish(monteCarloResult(plan, wi, trials, opts)); }
+      };
+      worker.onerror = ()=>{ cleanup(); finish(monteCarloResult(plan, wi, trials, opts)); };
+      worker.postMessage({ plan, wi, trials, opts: { storePaths:!!opts.storePaths, seed:opts.seed, ltcEvent:opts.ltcEvent, survivorEvent:opts.survivorEvent } });
+    }catch(e){
+      finish(monteCarloResult(plan, wi, trials, opts));
+    }
+  });
+}
+
+// ---- Deterministic historical stress-test replay (sequence-of-returns risk) ----
+// Applies a fixed, non-random sequence of equity shocks for the first N years of the plan
+// (or starting at retirement if the client hasn't retired yet), then reverts to the expected
+// capital market assumptions for the remainder. One deterministic path — no trials — so the
+// advisor can show exactly what a specific historical sequence would do to this specific plan.
+const STRESS_SCENARIOS = {
+  gfc2008: { label:'2008-style crash at retirement', years:[-37,26,15,2,16], applyAt:'retirement' },
+  lostDecade: { label:'Lost decade (2000s-style)', years:[-9,-12,-22,28,11,5,-37,26,15,2], applyAt:'retirement' },
+  stagflation: { label:'1970s-style stagflation', years:[-14,19,-15,-26,37], applyAt:'retirement', inflationOverride:8.5 },
+  earlyBear: { label:'Bear market in year 1 (today)', years:[-25,-10,15,20], applyAt:'today' }
+};
+function stressTestResult(plan, scenarioKey){
+  const scenario = STRESS_SCENARIOS[scenarioKey];
+  if(!scenario) return null;
+  const a1 = currentAge1(plan);
+  const a2 = currentAge2(plan);
+  const life1 = num(plan.household.client1.lifeExpectancy) || 92;
+  const retireAge1 = num(plan.household.client1.retireAge) || 65;
+  const yearsToRetire = Math.max(0, retireAge1 - a1);
+  const yearsInRetirement = Math.max(0, life1 - retireAge1);
+  const totalYears = Math.round(yearsToRetire + yearsInRetirement);
+  if(totalYears<=0 || a1<=0) return null;
+
+  const startingPortfolio = investablePortfolioValue(plan);
+  const cf = cashFlowTotals(plan);
+  const annualSavings = Math.max(0, cf.net);
+  const desiredSpend = plan.assumptions.desiredRetirementSpending!=='' && plan.assumptions.desiredRetirementSpending!==null
+    ? num(plan.assumptions.desiredRetirementSpending) : Math.max(0, cf.expenses);
+  const inflation = (scenario.inflationOverride ? scenario.inflationOverride : num(plan.assumptions.inflationRate))/100;
+  const cm = plan.assumptions.capitalMarket || {equityReturn:9.5,bondReturn:4.5,cashReturn:2.6};
+  const alloc = plan.assumptions.assetAllocation || {equityPre:75, equityPost:45, glideYears:10};
+
+  const shockStartYear = scenario.applyAt==='today' ? 0 : yearsToRetire;
+  const lumpGoalsByYear = {};
+  (plan.goals||[]).forEach(goal=>{
+    if(!goal.fundedFromPortfolio) return;
+    const yearsOut = num(goal.targetYear) - new Date().getFullYear();
+    if(yearsOut>=0 && yearsOut<=totalYears) lumpGoalsByYear[yearsOut] = (lumpGoalsByYear[yearsOut]||0) + num(goal.amountToday) * Math.pow(1+inflation, yearsOut);
+  });
+
+  let bal = startingPortfolio, spend = desiredSpend, save = annualSavings, low = bal, failed=false;
+  const path = [bal];
+  for(let y=0; y<totalYears; y++){
+    const inRetirement = y >= yearsToRetire;
+    const ew = glideEquityWeight(y, yearsToRetire, alloc);
+    const shockIdx = y - shockStartYear;
+    const equityReturn = (shockIdx>=0 && shockIdx<scenario.years.length) ? scenario.years[shockIdx]/100 : num(cm.equityReturn)/100;
+    const bondReturn = num(cm.bondReturn)/100, cashReturn = num(cm.cashReturn)/100;
+    const blended = ew*equityReturn + (1-ew)*0.75*bondReturn + (1-ew)*0.25*cashReturn;
+    bal *= (1+blended);
+    const age1y = a1+y+1, age2y = a2!==null?a2+y+1:null;
+    const guaranteed = guaranteedIncomeForYear(plan, age1y, age2y);
+    if(inRetirement){ bal -= Math.max(0, spend-guaranteed); } else { bal += save; }
+    if(lumpGoalsByYear[y]) bal -= lumpGoalsByYear[y];
+    if(bal<0){ bal=0; failed=true; }
+    low = Math.min(low, bal);
+    spend *= (1+inflation); save *= (1+inflation);
+    path.push(bal);
+  }
+  return { label: scenario.label, endingBalance: bal, lowestBalance: low, failed, path, yearsToRetire, totalYears };
+}
+
+// ---- Insurance needs (simplified DIME-style life insurance; income-replacement disability) ----
+function lifeInsuranceNeed(plan, ownerKey){
+  const ins = plan.insurance[ownerKey];
+  if(!ins) return null;
+  const cf = cashFlowTotals(plan);
+  const owner = ownerKey==='life1' ? plan.household.client1 : plan.household.client2;
+  const ownerIncome = plan.cashFlow.income.filter(i=> (ownerKey==='life1' ? i.owner==='client1' : i.owner==='client2') || i.owner==='joint')
+    .reduce((s,i)=>s+annualize(i.amount,i.freq),0);
+  const incomeReplacement = ownerIncome * num(ins.incomeReplaceYears);
+  const nw = netWorthTotals(plan);
+  const gross = incomeReplacement + num(ins.debtPayoff) + num(ins.finalExpenses) + num(ins.eduFundGoal);
+  const offsets = num(ins.existingCoverage) + Math.max(0, nw.assets - nw.liabilities) * 0; // liquid net worth offset intentionally left to advisor judgment
+  const need = Math.max(0, gross - num(ins.existingCoverage));
+  return { ownerIncome, incomeReplacement, gross, existingCoverage: num(ins.existingCoverage), need };
+}
+function disabilityGap(plan, ownerKey){
+  const d = plan.insurance[ownerKey];
+  if(!d) return null;
+  const monthlyExpenses = num(d.monthlyExpenses);
+  const existingBenefit = num(d.existingBenefit);
+  return { monthlyExpenses, existingBenefit, gap: Math.max(0, monthlyExpenses-existingBenefit) };
+}
+
+// ---- Education funding ----
+function educationProjection(goal){
+  const yearsUntilCollege = Math.max(0, num(goal.collegeAge) - num(goal.currentAge));
+  const inflation = num(goal.inflationRate)/100 || 0.05;
+  const yearsInCollege = num(goal.yearsInCollege) || 4;
+  const costPerYearToday = num(goal.currentCostPerYear);
+  let futureTotalCost = 0;
+  for(let y=0; y<yearsInCollege; y++){
+    futureTotalCost += costPerYearToday * Math.pow(1+inflation, yearsUntilCollege+y);
+  }
+  const growthRate = 0.06; // assumed 529-style growth rate for savings, separate from cost inflation
+  const currentSavings = num(goal.currentSavings);
+  const futureValueOfCurrentSavings = currentSavings * Math.pow(1+growthRate, yearsUntilCollege);
+  const gap = Math.max(0, futureTotalCost - futureValueOfCurrentSavings);
+  // Required monthly savings (ordinary annuity, monthly compounding) to close the gap by yearsUntilCollege.
+  const months = yearsUntilCollege*12;
+  const mRate = growthRate/12;
+  let requiredMonthly = 0;
+  if(months>0){
+    requiredMonthly = mRate>0 ? gap * mRate / (Math.pow(1+mRate,months)-1) : gap/months;
+  } else {
+    requiredMonthly = gap;
+  }
+  return { yearsUntilCollege, yearsInCollege, futureTotalCost, futureValueOfCurrentSavings, gap, requiredMonthly, currentMonthlyContribution: num(goal.monthlyContribution) };
+}
+
+// ==================== RENDER: MAIN SHELL ====================
+function renderMain(){
+  const main = $id('mainArea');
+  if(!activeId){ main.innerHTML = '<div class="empty" style="margin-top:60px;">Add a client to get started.</div>'; return; }
+  const sc = getSharedClient(activeId);
+  const plan = getPlan(activeId);
+  if(!sc || !plan){ main.innerHTML = '<div class="empty" style="margin-top:60px;">Add a client to get started.</div>'; return; }
+  const name = clientName(sc);
+
+  main.innerHTML = `
+    <div class="toolbar">
+      <div>
+        <h1 style="margin-bottom:2px;">${name}</h1>
+        <p class="sub" style="margin:0;">Full financial plan — goals, net worth, cash flow, and probability of success</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="btn secondary" id="manualSaveBtn" onclick="forceSavePlan('${activeId}')">Save</button>
+        <button class="btn" onclick="downloadPlanPDF('${activeId}')">Download PDF</button>
+      </div>
+    </div>
+    <div id="conflictBanner"></div>
+    <div class="tabs">
+      <div class="tab ${activeTab==='household'?'active':''}" onclick="setTab('household')">Household</div>
+      <div class="tab ${activeTab==='networth'?'active':''}" onclick="setTab('networth')">Net Worth</div>
+      <div class="tab ${activeTab==='cashflow'?'active':''}" onclick="setTab('cashflow')">Cash Flow</div>
+      <div class="tab ${activeTab==='goals'?'active':''}" onclick="setTab('goals')">Goals</div>
+      <div class="tab ${activeTab==='montecarlo'?'active':''}" onclick="setTab('montecarlo')">Probability of Success</div>
+      <div class="tab ${activeTab==='whatif'?'active':''}" onclick="setTab('whatif')">What-If</div>
+      <div class="tab ${activeTab==='stresstests'?'active':''}" onclick="setTab('stresstests')">Stress Tests</div>
+      <div class="tab ${activeTab==='scenarios'?'active':''}" onclick="setTab('scenarios')">Scenarios &amp; History</div>
+      <div class="tab ${activeTab==='socsec'?'active':''}" onclick="setTab('socsec')">Social Security</div>
+      <div class="tab ${activeTab==='insurance'?'active':''}" onclick="setTab('insurance')">Insurance Needs</div>
+      <div class="tab ${activeTab==='education'?'active':''}" onclick="setTab('education')">Education Funding</div>
+    </div>
+    <div id="tabContent"></div>
+    <footer class="tool-foot">Redmount Capital Partners — internal use</footer>
+  `;
+  renderConflictBanner();
+  renderTab();
+}
+
+function renderTab(){
+  const plan = getPlan(activeId);
+  const wrap = $id('tabContent');
+  if(activeTab==='household') wrap.innerHTML = householdTabHTML(plan);
+  else if(activeTab==='networth') wrap.innerHTML = netWorthTabHTML(plan);
+  else if(activeTab==='cashflow') wrap.innerHTML = cashFlowTabHTML(plan);
+  else if(activeTab==='goals') wrap.innerHTML = goalsTabHTML(plan);
+  else if(activeTab==='montecarlo') renderMonteCarloTabAsync(plan);
+  else if(activeTab==='whatif') wrap.innerHTML = whatIfTabHTML(plan);
+  else if(activeTab==='stresstests') wrap.innerHTML = stressTestsTabHTML(plan);
+  else if(activeTab==='scenarios') wrap.innerHTML = scenariosTabHTML(plan);
+  else if(activeTab==='socsec') wrap.innerHTML = socSecTabHTML(plan);
+  else if(activeTab==='insurance') wrap.innerHTML = insuranceTabHTML(plan);
+  else if(activeTab==='education') wrap.innerHTML = educationTabHTML(plan);
+}
+
+function markDirty(){ /* the autosave loop diffs plans[] every 4s; nothing else needed here */ }
+
+// Fields worth an audit trail entry — assumptions and timeline inputs that materially change a
+// projection, not every keystroke on a name/note field.
+const AUDIT_PATH_PATTERNS = [/^assumptions\./, /^socialSecurity\./, /^monteCarlo\.trials$/, /retireAge$/, /lifeExpectancy$/];
+function currentUserEmail(){
+  const session = loadStoredSession();
+  return (session && session.email) || 'unknown';
+}
+function logAudit(plan, path, oldVal, newVal){
+  if(!AUDIT_PATH_PATTERNS.some(rx=>rx.test(path))) return;
+  if(JSON.stringify(oldVal)===JSON.stringify(newVal)) return;
+  plan.auditLog = plan.auditLog || [];
+  plan.auditLog.unshift({ ts: Date.now(), user: currentUserEmail(), path, oldVal, newVal });
+  if(plan.auditLog.length>50) plan.auditLog.length = 50;
+}
+function update(path, val){
+  const plan = getPlan(activeId);
+  const parts = path.split('.');
+  let obj = plan;
+  for(let i=0;i<parts.length-1;i++) obj = obj[parts[i]];
+  const key = parts[parts.length-1];
+  const oldVal = obj[key];
+  obj[key] = val;
+  logAudit(plan, path, oldVal, val);
+  markDirty();
+}
+
+// ==================== TAB: HOUSEHOLD ====================
+function householdTabHTML(plan){
+  const h = plan.household;
+  return `
+  ${validationBannerHTML(plan)}
+  <div class="panel">
+    <h2>Client 1</h2>
+    <div class="row">
+      <div class="field"><label>First name</label><input value="${h.client1.first||''}" onchange="update('household.client1.first', this.value); renderClientList();"></div>
+      <div class="field"><label>Last name</label><input value="${h.client1.last||''}" onchange="update('household.client1.last', this.value); renderClientList();"></div>
+      <div class="field"><label>Date of birth</label><input type="date" value="${h.client1.dob||''}" onchange="update('household.client1.dob', this.value); renderTab();"></div>
+      <div class="field"><label>Planned retirement age</label><input type="number" value="${h.client1.retireAge}" onchange="update('household.client1.retireAge', this.value); renderTab();"></div>
+      <div class="field"><label>Life expectancy (planning age)</label><input type="number" value="${h.client1.lifeExpectancy}" onchange="update('household.client1.lifeExpectancy', this.value); renderTab();"></div>
+    </div>
+    <div style="font-size:12.5px; color:var(--ink-dim);">Current age: ${currentAge1(plan) || '—'}</div>
+  </div>
+
+  <div class="panel">
+    <h2>Client 2 (spouse/partner)</h2>
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:14px;">
+      <input type="checkbox" ${h.hasClient2?'checked':''} onchange="update('household.hasClient2', this.checked); renderTab();"> This plan includes a second household member
+    </label>
+    ${h.hasClient2 ? `
+    <div class="row">
+      <div class="field"><label>First name</label><input value="${h.client2.first||''}" onchange="update('household.client2.first', this.value)"></div>
+      <div class="field"><label>Last name</label><input value="${h.client2.last||''}" onchange="update('household.client2.last', this.value)"></div>
+      <div class="field"><label>Date of birth</label><input type="date" value="${h.client2.dob||''}" onchange="update('household.client2.dob', this.value); renderTab();"></div>
+      <div class="field"><label>Planned retirement age</label><input type="number" value="${h.client2.retireAge}" onchange="update('household.client2.retireAge', this.value); renderTab();"></div>
+      <div class="field"><label>Life expectancy (planning age)</label><input type="number" value="${h.client2.lifeExpectancy}" onchange="update('household.client2.lifeExpectancy', this.value); renderTab();"></div>
+    </div>
+    <div style="font-size:12.5px; color:var(--ink-dim);">Current age: ${currentAge2(plan) ?? '—'}</div>` : ''}
+  </div>
+
+  <div class="panel">
+    <h2>Household</h2>
+    <div class="row">
+      <div class="field"><label>Filing status</label>
+        <select onchange="update('household.filingStatus', this.value)">
+          <option value="">—</option>
+          ${['Single','Married Filing Jointly','Married Filing Separately','Head of Household'].map(o=>`<option value="${o}" ${h.filingStatus===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Dependents</label><input type="number" value="${h.dependents||0}" onchange="update('household.dependents', this.value)"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Risk Tolerance</h2>
+    <p class="desc">A manual, self-reported reference point for this plan (independent of the Risk Modeling tool's own roster) — used only to flag if the Probability of Success tab's equity glide path looks out of step with how the client describes their own risk tolerance.</p>
+    <div class="row">
+      <div class="field"><label>Self-reported risk tolerance</label>
+        <select onchange="update('household.riskToleranceLabel', this.value); renderTab();">
+          <option value="">—</option>
+          ${['Conservative','Moderate','Aggressive'].map(o=>`<option value="${o}" ${h.riskToleranceLabel===o?'selected':''}>${o}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Notes / score (optional)</label><input value="${h.riskToleranceScore||''}" placeholder="e.g. 62/100 from questionnaire" onchange="update('household.riskToleranceScore', this.value)"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Plan Notes</h2>
+    <textarea rows="4" onchange="update('notes', this.value)">${plan.notes||''}</textarea>
+  </div>
+  `;
+}
+
+// ==================== TAB: NET WORTH ====================
+function addAsset(){
+  const plan = getPlan(activeId);
+  plan.netWorth.assets.push({id:uid('a'), name:'', category:'Investment', value:''});
+  renderTab();
+}
+function removeAsset(idx){ const plan=getPlan(activeId); plan.netWorth.assets.splice(idx,1); renderTab(); }
+function updateAsset(idx, field, val){ const plan=getPlan(activeId); plan.netWorth.assets[idx][field]=val; if(field!=='name') renderTab(); }
+function addLiability(){
+  const plan = getPlan(activeId);
+  plan.netWorth.liabilities.push({id:uid('l'), name:'', category:'Mortgage', balance:'', rate:''});
+  renderTab();
+}
+function removeLiability(idx){ const plan=getPlan(activeId); plan.netWorth.liabilities.splice(idx,1); renderTab(); }
+function updateLiability(idx, field, val){ const plan=getPlan(activeId); plan.netWorth.liabilities[idx][field]=val; if(field!=='name') renderTab(); }
+
+function netWorthTabHTML(plan){
+  const t = netWorthTotals(plan);
+  const assetRows = plan.netWorth.assets.map((a,i)=>`
+    <tr>
+      <td><input class="compact" value="${a.name||''}" placeholder="e.g. Schwab Brokerage" onchange="updateAsset(${i},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateAsset(${i},'category',this.value)">${ASSET_CATEGORIES.map(c=>`<option value="${c}" ${a.category===c?'selected':''}>${c}</option>`).join('')}</select></td>
+      <td><input class="compact" type="number" value="${a.value}" onchange="updateAsset(${i},'value',this.value)"></td>
+      <td><button class="removeX" onclick="removeAsset(${i})">✕</button></td>
+    </tr>`).join('');
+  const liabRows = plan.netWorth.liabilities.map((l,i)=>`
+    <tr>
+      <td><input class="compact" value="${l.name||''}" placeholder="e.g. Primary mortgage" onchange="updateLiability(${i},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateLiability(${i},'category',this.value)">${LIABILITY_CATEGORIES.map(c=>`<option value="${c}" ${l.category===c?'selected':''}>${c}</option>`).join('')}</select></td>
+      <td><input class="compact" type="number" value="${l.balance}" onchange="updateLiability(${i},'balance',this.value)"></td>
+      <td><input class="compact" type="number" value="${l.rate}" placeholder="Rate %" style="max-width:90px;" onchange="updateLiability(${i},'rate',this.value)"></td>
+      <td><button class="removeX" onclick="removeLiability(${i})">✕</button></td>
+    </tr>`).join('');
+
+  return `
+  <div class="summary-cards">
+    <div class="scard good"><div class="label">Total Assets</div><div class="value">${fmt$(t.assets)}</div></div>
+    <div class="scard bad"><div class="label">Total Liabilities</div><div class="value">${fmt$(t.liabilities)}</div></div>
+    <div class="scard"><div class="label">Net Worth</div><div class="value">${fmt$(t.net)}</div></div>
+    <div class="scard"><div class="label">Investable Portfolio</div><div class="value">${fmt$(investablePortfolioValue(plan))}</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Assets</h2>
+    <p class="desc">"Investment" and "Retirement" categories feed the investable portfolio used in the Monte Carlo projection — or override that figure directly below.</p>
+    <table>
+      <thead><tr><th>Name</th><th>Category</th><th>Value</th><th></th></tr></thead>
+      <tbody>${assetRows || '<tr><td colspan="4" style="color:#bbb;">No assets yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addAsset()">+ Add asset</button>
+    <div class="divider"></div>
+    <div class="field" style="max-width:280px;">
+      <label>Override investable portfolio value (optional)</label>
+      <input type="number" value="${plan.assumptions.currentPortfolioOverride}" placeholder="Leave blank to use Investment + Retirement assets above" onchange="update('assumptions.currentPortfolioOverride', this.value)">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Liabilities</h2>
+    <table>
+      <thead><tr><th>Name</th><th>Category</th><th>Balance</th><th>Rate</th><th></th></tr></thead>
+      <tbody>${liabRows || '<tr><td colspan="5" style="color:#bbb;">No liabilities yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addLiability()">+ Add liability</button>
+  </div>
+  `;
+}
+
+// ==================== TAB: CASH FLOW ====================
+function addIncome(){ const plan=getPlan(activeId); plan.cashFlow.income.push({id:uid('inc'), name:'', amount:'', freq:'annual', owner:'joint'}); renderTab(); }
+function removeIncome(idx){ const plan=getPlan(activeId); plan.cashFlow.income.splice(idx,1); renderTab(); }
+function updateIncome(idx, field, val){ const plan=getPlan(activeId); plan.cashFlow.income[idx][field]=val; if(field!=='name') renderTab(); }
+function addExpense(){ const plan=getPlan(activeId); plan.cashFlow.expenses.push({id:uid('exp'), name:'', amount:'', freq:'annual', essential:true}); renderTab(); }
+function removeExpense(idx){ const plan=getPlan(activeId); plan.cashFlow.expenses.splice(idx,1); renderTab(); }
+function updateExpense(idx, field, val){ const plan=getPlan(activeId); plan.cashFlow.expenses[idx][field]=val; if(field!=='name') renderTab(); }
+
+function cashFlowTabHTML(plan){
+  const t = cashFlowTotals(plan);
+  const incRows = plan.cashFlow.income.map((i,idx)=>`
+    <tr>
+      <td><input class="compact" value="${i.name||''}" placeholder="e.g. Salary" onchange="updateIncome(${idx},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateIncome(${idx},'owner',this.value)">
+        <option value="joint" ${i.owner==='joint'?'selected':''}>Joint</option>
+        <option value="client1" ${i.owner==='client1'?'selected':''}>Client 1</option>
+        <option value="client2" ${i.owner==='client2'?'selected':''}>Client 2</option>
+      </select></td>
+      <td><input class="compact" type="number" value="${i.amount}" onchange="updateIncome(${idx},'amount',this.value)"></td>
+      <td><select class="compact" onchange="updateIncome(${idx},'freq',this.value)">
+        <option value="annual" ${i.freq==='annual'?'selected':''}>Annual</option>
+        <option value="monthly" ${i.freq==='monthly'?'selected':''}>Monthly</option>
+      </select></td>
+      <td><button class="removeX" onclick="removeIncome(${idx})">✕</button></td>
+    </tr>`).join('');
+  const expRows = plan.cashFlow.expenses.map((e,idx)=>`
+    <tr>
+      <td><input class="compact" value="${e.name||''}" placeholder="e.g. Mortgage payment" onchange="updateExpense(${idx},'name',this.value)"></td>
+      <td><input class="compact" type="number" value="${e.amount}" onchange="updateExpense(${idx},'amount',this.value)"></td>
+      <td><select class="compact" onchange="updateExpense(${idx},'freq',this.value)">
+        <option value="annual" ${e.freq==='annual'?'selected':''}>Annual</option>
+        <option value="monthly" ${e.freq==='monthly'?'selected':''}>Monthly</option>
+      </select></td>
+      <td style="text-align:center;"><input type="checkbox" ${e.essential?'checked':''} onchange="updateExpense(${idx},'essential',this.checked)"></td>
+      <td><button class="removeX" onclick="removeExpense(${idx})">✕</button></td>
+    </tr>`).join('');
+
+  return `
+  <div class="summary-cards">
+    <div class="scard good"><div class="label">Total Income</div><div class="value">${fmt$(t.income)}</div></div>
+    <div class="scard bad"><div class="label">Total Expenses</div><div class="value">${fmt$(t.expenses)}</div></div>
+    <div class="scard ${t.net>=0?'good':'bad'}"><div class="label">Net Cash Flow</div><div class="value">${fmt$(t.net)}</div></div>
+  </div>
+
+  <div class="panel">
+    <h2>Income</h2>
+    <table>
+      <thead><tr><th>Source</th><th>Owner</th><th>Amount</th><th>Frequency</th><th></th></tr></thead>
+      <tbody>${incRows || '<tr><td colspan="5" style="color:#bbb;">No income sources yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addIncome()">+ Add income source</button>
+  </div>
+
+  <div class="panel">
+    <h2>Expenses</h2>
+    <p class="desc">Marking an expense "essential" doesn't change the math here — it's a flag for the What-If tab conversation about what's actually cuttable if spending needs to come down.</p>
+    <table>
+      <thead><tr><th>Expense</th><th>Amount</th><th>Frequency</th><th>Essential</th><th></th></tr></thead>
+      <tbody>${expRows || '<tr><td colspan="5" style="color:#bbb;">No expenses yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addExpense()">+ Add expense</button>
+  </div>
+  `;
+}
+
+// ==================== TAB: GOALS ====================
+const GOAL_TYPES = ['Retirement','Education','Major Purchase','Legacy','Travel','Other'];
+function addGoal(){
+  const plan = getPlan(activeId);
+  plan.goals.push({id:uid('g'), name:'', type:'Retirement', priority:'need', targetYear: new Date().getFullYear()+10, amountToday:'', fundedFromPortfolio:true});
+  renderTab();
+}
+function removeGoal(idx){ const plan=getPlan(activeId); plan.goals.splice(idx,1); renderTab(); }
+function updateGoal(idx, field, val){ const plan=getPlan(activeId); plan.goals[idx][field]=val; if(field!=='name') renderTab(); }
+
+function goalsTabHTML(plan){
+  const priorityLabel = {need:'Need', want:'Want', wish:'Wish'};
+  const priorityColor = {need:'var(--bad)', want:'var(--warn)', wish:'var(--cobalt)'};
+  const rows = plan.goals.map((g,i)=>`
+    <tr>
+      <td><input class="compact" value="${g.name||''}" placeholder="e.g. Retire comfortably" onchange="updateGoal(${i},'name',this.value)"></td>
+      <td><select class="compact" onchange="updateGoal(${i},'type',this.value)">${GOAL_TYPES.map(t=>`<option value="${t}" ${g.type===t?'selected':''}>${t}</option>`).join('')}</select></td>
+      <td><select class="compact" onchange="updateGoal(${i},'priority',this.value)">
+        <option value="need" ${g.priority==='need'?'selected':''}>Need</option>
+        <option value="want" ${g.priority==='want'?'selected':''}>Want</option>
+        <option value="wish" ${g.priority==='wish'?'selected':''}>Wish</option>
+      </select></td>
+      <td><input class="compact" type="number" value="${g.targetYear}" style="max-width:90px;" onchange="updateGoal(${i},'targetYear',this.value)"></td>
+      <td><input class="compact" type="number" value="${g.amountToday}" onchange="updateGoal(${i},'amountToday',this.value)"></td>
+      <td style="text-align:center;"><input type="checkbox" ${g.fundedFromPortfolio?'checked':''} onchange="updateGoal(${i},'fundedFromPortfolio',this.checked)" title="Draw this goal as a lump sum from the investable portfolio in the Monte Carlo projection"></td>
+      <td><button class="removeX" onclick="removeGoal(${i})">✕</button></td>
+    </tr>`).join('');
+
+  return `
+  <div class="panel">
+    <h2>Goals</h2>
+    <p class="desc"><strong>Need / Want / Wish</strong> mirrors the classic goals-based planning hierarchy — Needs are non-negotiable, Wants meaningfully improve the plan, Wishes are stretch goals. "Draw from portfolio" goals (retirement lump sums, a home purchase, a wedding) get pulled directly out of the investable portfolio in the target year for the Probability of Success projection; leave it unchecked for goals funded some other way (gifted down payment, separate 529, etc.) that shouldn't hit the main portfolio.</p>
+    <table>
+      <thead><tr><th>Goal</th><th>Type</th><th>Priority</th><th>Target Year</th><th>Amount (today's $)</th><th>Draw from portfolio</th><th></th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7" style="color:#bbb;">No goals yet.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addGoal()">+ Add goal</button>
+  </div>
+
+  <div class="panel">
+    <h2>Priority Legend</h2>
+    <div style="display:flex; gap:18px; flex-wrap:wrap;">
+      ${Object.keys(priorityLabel).map(k=>`<span class="flag" style="background:${priorityColor[k]}22; color:${priorityColor[k]};">${priorityLabel[k]}</span>`).join('')}
+    </div>
+  </div>
+
+  ${(() => {
+    const waterfall = goalWaterfallAnalysis(plan);
+    if(!waterfall) return '';
+    return `
+    <div class="panel">
+      <h2>Goal-Funding Waterfall</h2>
+      <p class="desc">If the plan is at risk, this shows how much the probability of success improves by deferring lower-priority "draw from portfolio" goals — useful for a direct conversation about trade-offs.</p>
+      <table>
+        <thead><tr><th>Scenario</th><th>Probability of Success</th><th>Median Ending Balance</th></tr></thead>
+        <tbody>${waterfall.map(w=>`<tr><td>${esc(w.label)}</td><td>${w.successRate}%</td><td>${fmt$(w.medianEndingBalance)}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>`;
+  })()}
+  `;
+}
+
+// ==================== TAB: PROBABILITY OF SUCCESS (MONTE CARLO) ====================
+function buildFanChartSVG(percentiles, yearsToRetire, startYear){
+  if(!percentiles || percentiles.length<2) return '';
+  const W=860, H=320, padL=64, padR=16, padT=16, padB=32;
+  const innerW = W-padL-padR, innerH = H-padT-padB;
+  const n = percentiles.length;
+  const maxVal = Math.max(1, ...percentiles.map(p=>p.p90));
+  const x = i => padL + (innerW * i/(n-1));
+  const y = v => padT + innerH - (innerH * (v/maxVal));
+  const pathFor = key => percentiles.map((p,i)=> (i===0?'M':'L') + x(i).toFixed(1) + ',' + y(p[key]).toFixed(1)).join(' ');
+  const areaBetween = (topKey, botKey) => {
+    const top = percentiles.map((p,i)=> (i===0?'M':'L') + x(i).toFixed(1) + ',' + y(p[topKey]).toFixed(1)).join(' ');
+    const bot = [...percentiles].map((p,i)=> x(i).toFixed(1) + ',' + y(p[botKey]).toFixed(1)).reverse().join(' L ');
+    return top + ' L ' + bot + ' Z';
+  };
+  const retireX = x(Math.min(n-1, Math.max(0, yearsToRetire)));
+  const gridLines = [0,0.25,0.5,0.75,1].map(f=>{
+    const val = maxVal*f;
+    const yy = y(val);
+    return `<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="#e2e6ee" stroke-width="1"/>
+      <text x="${padL-8}" y="${yy+4}" font-size="10" fill="#5b6b82" text-anchor="end">${val>=1000000?(val/1000000).toFixed(1)+'M':val>=1000?Math.round(val/1000)+'K':Math.round(val)}</text>`;
+  }).join('');
+  const yearLabels = [0, Math.round((n-1)*0.25), Math.round((n-1)*0.5), Math.round((n-1)*0.75), n-1].map(i=>{
+    return `<text x="${x(i)}" y="${H-8}" font-size="10" fill="#5b6b82" text-anchor="middle">${startYear+i}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto;">
+    ${gridLines}
+    <line x1="${retireX}" y1="${padT}" x2="${retireX}" y2="${H-padB}" stroke="#8a5a00" stroke-width="1.2" stroke-dasharray="4,3"/>
+    <text x="${retireX+4}" y="${padT+12}" font-size="10" fill="#8a5a00" font-weight="700">Retirement</text>
+    <path d="${areaBetween('p90','p10')}" fill="#2f6fed" opacity="0.10"/>
+    <path d="${areaBetween('p75','p25')}" fill="#2f6fed" opacity="0.22"/>
+    <path d="${pathFor('p50')}" fill="none" stroke="#002347" stroke-width="2.2"/>
+    <path d="${pathFor('p10')}" fill="none" stroke="#9c2b2b" stroke-width="1" stroke-dasharray="2,2" opacity="0.6"/>
+    ${yearLabels}
+  </svg>`;
+}
+
+function reshuffleSeed(){
+  const plan = getPlan(activeId);
+  plan.monteCarlo.seed = Math.floor(Math.random()*1e9);
+  markDirty();
+  renderTab();
+}
+
+function runStressTest(key){
+  stressTestSelection = key;
+  renderTab();
+}
+
+// Kicks off the (worker-backed) Monte Carlo run with a progress bar, then swaps in the real tab
+// content once it resolves. Guards against a stale result landing after the user has navigated away.
+let mcRunToken = 0;
+function renderMonteCarloTabAsync(plan){
+  const wrap = $id('tabContent');
+  const issues = validatePlan(plan);
+  if(issues.some(i=>i.level==='error')){
+    wrap.innerHTML = validationBannerHTML(plan) + `<div class="panel"><div class="empty">Fix the issues above to run the projection.</div></div>`;
+    return;
+  }
+  const myToken = ++mcRunToken;
+  wrap.innerHTML = `<div class="panel"><h2>Probability of Success</h2>
+    <div class="empty">Running simulation…
+      <div class="bar-track" style="max-width:320px; margin:12px auto 0;"><div class="bar-fill" id="mcProgressFill" style="width:0%;"></div></div>
+    </div></div>`;
+  const trials = Math.max(50, num(plan.monteCarlo.trials) || 1000);
+  runMonteCarloAsync(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}, trials, {
+    storePaths:true, seed: plan.monteCarlo.seed,
+    onProgress:(done,total)=>{ const fill=$id('mcProgressFill'); if(fill) fill.style.width = Math.round(done/total*100)+'%'; }
+  }).then(result=>{
+    if(myToken!==mcRunToken) return; // user navigated away or reshuffled before this finished
+    if($id('tabContent')) $id('tabContent').innerHTML = monteCarloTabHTML(plan, result);
+  });
+}
+
+function monteCarloTabHTML(plan, result){
+  if(!result) result = monteCarloResult(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}, null, {storePaths:true, seed:plan.monteCarlo.seed});
+  if(result.trials===0){
+    return validationBannerHTML(plan) + `<div class="panel"><div class="empty">Enter a date of birth on the Household tab (and a retirement/life expectancy age) to run the projection.</div></div>`;
+  }
+  const rate = result.successRate;
+  const tone = rate>=80 ? 'good' : rate>=60 ? 'warn' : 'bad';
+  const barColor = rate>=80 ? 'var(--good)' : rate>=60 ? 'var(--warn)' : 'var(--bad)';
+  const cm = plan.assumptions.capitalMarket;
+  const alloc = plan.assumptions.assetAllocation;
+  const gr = plan.assumptions.guardrails;
+  const rmd = plan.assumptions.rmd;
+  const hc = plan.assumptions.healthcareBridge;
+  const startYear = new Date().getFullYear();
+  const mode = plan.assumptions.displayMode || 'nominal';
+  const inflation = num(plan.assumptions.inflationRate)/100;
+  const displayPercentiles = deflatePercentiles(result.percentiles, inflation, mode);
+  const displayMedian = toDisplayDollars(result.medianEndingBalance, result.yearsToRetire+result.yearsInRetirement, inflation, mode);
+  const riskFlag = riskToleranceMismatch(plan);
+
+  return `
+  ${validationBannerHTML(plan)}
+  <div class="panel">
+    <h2>Probability of Success</h2>
+    <p class="desc">Monte Carlo simulation (${result.trials} trials, seed #${plan.monteCarlo.seed}) of the investable portfolio from today through age ${num(plan.household.client1.lifeExpectancy)||92}, using a correlated equity/bond/cash engine with the glide path and capital market assumptions below. "Success" means the portfolio never runs out across the full retirement horizon in that trial. Results are seeded, so reopening this plan reproduces the same figure — use "Reshuffle" for a fresh random draw.</p>
+    <div class="pos-meter">
+      <div>
+        <div class="pos-num ${tone}">${rate}%</div>
+        <div class="pos-label">Probability of Success</div>
+      </div>
+      <div class="pos-track"><div class="pos-fill" style="width:${rate}%; background:${barColor};"></div></div>
+      <button class="btn ghost" onclick="reshuffleSeed()">↻ Reshuffle</button>
+    </div>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
+      ${rate>=80 ? '<span class="gap-flag aligned">On track</span>' : rate>=60 ? '<span class="gap-flag under">Needs attention</span>' : '<span class="gap-flag over">At risk — plan changes likely needed</span>'}
+    </div>
+  </div>
+
+  <div class="summary-cards">
+    <div class="scard"><div class="label">Years to Retirement</div><div class="value">${result.yearsToRetire}</div></div>
+    <div class="scard"><div class="label">Years in Retirement</div><div class="value">${result.yearsInRetirement}</div></div>
+    <div class="scard"><div class="label">Starting Portfolio</div><div class="value">${fmt$(result.startingPortfolio)}</div></div>
+    <div class="scard"><div class="label">Median Ending Balance</div><div class="value">${fmt$(displayMedian)}</div></div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar" style="margin-bottom:6px;">
+      <h2 style="margin:0;">Portfolio Balance Range Over Time</h2>
+      <div style="display:flex; gap:0; border:1px solid var(--line); border-radius:7px; overflow:hidden;">
+        <button class="btn ${mode==='nominal'?'':'secondary'} compact" style="border-radius:0;" onclick="update('assumptions.displayMode','nominal'); renderTab();">Nominal $</button>
+        <button class="btn ${mode==='real'?'':'secondary'} compact" style="border-radius:0;" onclick="update('assumptions.displayMode','real'); renderTab();">Today's $</button>
+      </div>
+    </div>
+    <p class="desc">Shaded bands show the 10th–90th and 25th–75th percentile range of portfolio value across all trials each year; the dark line is the median path; the dashed red line is the 10th-percentile (bad-case) path. ${mode==='real' ? 'Shown in today\'s purchasing power (inflation-adjusted).' : 'Shown in future (nominal) dollars.'}</p>
+    ${buildFanChartSVG(displayPercentiles, result.yearsToRetire, startYear)}
+  </div>
+
+  <div class="panel">
+    <h2>Retirement Cash Flow Assumptions</h2>
+    <div class="row">
+      <div class="field"><label>Desired retirement spending / yr (leave blank to use current expenses)</label>
+        <input type="number" value="${plan.assumptions.desiredRetirementSpending}" onchange="update('assumptions.desiredRetirementSpending', this.value); renderTab();"></div>
+      <div class="field"><label>Inflation rate %</label><input type="number" step="0.1" value="${plan.assumptions.inflationRate}" onchange="update('assumptions.inflationRate', this.value); renderTab();"></div>
+      <div class="field"><label>Effective tax drag on withdrawals %</label><input type="number" step="0.5" value="${plan.assumptions.effectiveTaxRate}" onchange="update('assumptions.effectiveTaxRate', this.value); renderTab();"></div>
+    </div>
+    <div class="field" style="max-width:200px;">
+      <label>Simulation trials</label>
+      <input type="number" value="${plan.monteCarlo.trials}" onchange="update('monteCarlo.trials', Math.max(50,this.value)); renderTab();">
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Capital Market Assumptions &amp; Glide Path</h2>
+    <p class="desc">Three-asset-class engine (equity / bond / cash) with a glide path from the pre-retirement equity weight down to the post-retirement equity weight over the years leading into retirement. Returns are drawn as correlated, lognormal annual figures — equity and bond are modeled with a mild negative correlation, consistent with typical long-run behavior.</p>
+    <div class="row">
+      <div class="field"><label>Equity return %</label><input type="number" step="0.1" value="${cm.equityReturn}" onchange="update('assumptions.capitalMarket.equityReturn', this.value); renderTab();"></div>
+      <div class="field"><label>Equity volatility %</label><input type="number" step="0.1" value="${cm.equityVol}" onchange="update('assumptions.capitalMarket.equityVol', this.value); renderTab();"></div>
+      <div class="field"><label>Bond return %</label><input type="number" step="0.1" value="${cm.bondReturn}" onchange="update('assumptions.capitalMarket.bondReturn', this.value); renderTab();"></div>
+      <div class="field"><label>Bond volatility %</label><input type="number" step="0.1" value="${cm.bondVol}" onchange="update('assumptions.capitalMarket.bondVol', this.value); renderTab();"></div>
+      <div class="field"><label>Cash return %</label><input type="number" step="0.1" value="${cm.cashReturn}" onchange="update('assumptions.capitalMarket.cashReturn', this.value); renderTab();"></div>
+      <div class="field"><label>Cash volatility %</label><input type="number" step="0.1" value="${cm.cashVol}" onchange="update('assumptions.capitalMarket.cashVol', this.value); renderTab();"></div>
+    </div>
+    <div class="row">
+      <div class="field"><label>Pre-retirement equity weight %</label><input type="number" value="${alloc.equityPre}" onchange="update('assumptions.assetAllocation.equityPre', this.value); renderTab();"></div>
+      <div class="field"><label>Post-retirement equity weight %</label><input type="number" value="${alloc.equityPost}" onchange="update('assumptions.assetAllocation.equityPost', this.value); renderTab();"></div>
+      <div class="field"><label>Glide path length (yrs before retirement)</label><input type="number" value="${alloc.glideYears}" onchange="update('assumptions.assetAllocation.glideYears', this.value); renderTab();"></div>
+    </div>
+    <div style="font-size:12px; color:var(--ink-dim);">Non-equity sleeve is split 75% bond / 25% cash at every point on the glide path.</div>
+    ${riskFlag ? `<div class="note" style="margin-top:12px;"><strong>Risk tolerance check:</strong> ${esc(riskFlag)}</div>` : ''}
+  </div>
+
+  <div class="panel">
+    <h2>Spending Guardrails</h2>
+    <p class="desc">Simplified Guyton-Klinger-style dynamic spending: if the current withdrawal rate drifts too far above the plan's initial target rate, spending is cut; if it drifts too far below, spending is raised. Off by default so the projection matches a straightforward "spend the plan, inflate every year" assumption.</p>
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px;">
+      <input type="checkbox" ${gr.enabled?'checked':''} onchange="update('assumptions.guardrails.enabled', this.checked); renderTab();"> Enable spending guardrails
+    </label>
+    ${gr.enabled ? `
+    <div class="row">
+      <div class="field"><label>Cut trigger (withdrawal rate rises this % above target)</label><input type="number" value="${gr.cutTriggerPct}" onchange="update('assumptions.guardrails.cutTriggerPct', this.value); renderTab();"></div>
+      <div class="field"><label>Spending cut %</label><input type="number" value="${gr.cutAmountPct}" onchange="update('assumptions.guardrails.cutAmountPct', this.value); renderTab();"></div>
+      <div class="field"><label>Raise trigger (withdrawal rate falls this % below target)</label><input type="number" value="${gr.raiseTriggerPct}" onchange="update('assumptions.guardrails.raiseTriggerPct', this.value); renderTab();"></div>
+      <div class="field"><label>Spending raise %</label><input type="number" value="${gr.raiseAmountPct}" onchange="update('assumptions.guardrails.raiseAmountPct', this.value); renderTab();"></div>
+    </div>` : ''}
+  </div>
+
+  <div class="panel">
+    <h2>Required Minimum Distributions</h2>
+    <p class="desc">Once the client reaches age 73, the IRS requires a minimum distribution from tax-deferred (Retirement-category) accounts each year. If planned spending withdrawals already exceed that amount, nothing changes. If not, the shortfall is still a forced taxable event — modeled here as an extra tax drag rather than an artificial reduction in total wealth (the cash itself stays invested, just in a taxable account).</p>
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px;">
+      <input type="checkbox" ${rmd.enabled?'checked':''} onchange="update('assumptions.rmd.enabled', this.checked); renderTab();"> Model RMDs starting at age 73
+    </label>
+    ${rmd.enabled ? `<div class="field" style="max-width:220px;"><label>Tax rate applied to excess RMD %</label><input type="number" value="${rmd.taxRate}" onchange="update('assumptions.rmd.taxRate', this.value); renderTab();"></div>
+    <div style="font-size:12px; color:var(--ink-dim);">Based on ${fmtPct(retirementAssetFraction(plan)*100,0)} of the current portfolio being categorized "Retirement" on the Net Worth tab.</div>` : ''}
+  </div>
+
+  <div class="panel">
+    <h2>Healthcare Cost Bridge</h2>
+    <p class="desc">An additional, separately-inflating spending line for healthcare costs before Medicare eligibility and after — on top of the desired retirement spending figure above.</p>
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px;">
+      <input type="checkbox" ${hc.enabled?'checked':''} onchange="update('assumptions.healthcareBridge.enabled', this.checked); renderTab();"> Model a healthcare cost bridge
+    </label>
+    ${hc.enabled ? `
+    <div class="row">
+      <div class="field"><label>Pre-Medicare annual cost</label><input type="number" value="${hc.preMedicareAnnual}" onchange="update('assumptions.healthcareBridge.preMedicareAnnual', this.value); renderTab();"></div>
+      <div class="field"><label>Medicare-era annual cost</label><input type="number" value="${hc.medicareAnnual}" onchange="update('assumptions.healthcareBridge.medicareAnnual', this.value); renderTab();"></div>
+      <div class="field"><label>Medicare start age</label><input type="number" value="${hc.medicareStartAge}" onchange="update('assumptions.healthcareBridge.medicareStartAge', this.value); renderTab();"></div>
+      <div class="field"><label>Healthcare inflation %</label><input type="number" step="0.1" value="${hc.inflationRate}" onchange="update('assumptions.healthcareBridge.inflationRate', this.value); renderTab();"></div>
+    </div>
+    <div style="font-size:12px; color:var(--ink-dim);">Timed off Client 1's age; if ages differ meaningfully between spouses, treat this as directional.</div>` : ''}
+  </div>
+
+  <div class="panel">
+    <h2>Guaranteed Income</h2>
+    <p class="desc">Pulled from the Social Security and Pensions tabs — turned on in the actual year each benefit starts (its claim age / pension start age), not automatically at retirement.</p>
+    <div style="font-size:20px; font-weight:800; color:var(--navy);">${fmt$(result.guaranteed)}<span style="font-size:12px; font-weight:600; color:var(--ink-dim);"> / yr, once fully claimed</span></div>
+  </div>
+
+  <div class="note"><strong>Methodology:</strong> Three-asset-class (equity/bond/cash) Monte Carlo with a glide path and one-factor correlation between asset classes; annual returns are true lognormal draws so a single year can never compound below -100%. Guaranteed income turns on at each benefit's actual start age rather than at retirement. RMDs and a healthcare cost bridge can be toggled above. Does not model Roth-conversion / tax-bracket sequencing, or full estate/legacy planning. Treat the percentage as a directional planning signal, not a guarantee, and pair it with the advisor's judgment on the specific plan. Survivor and long-term-care events, and historical stress sequences, are on the Stress Tests tab.</div>
+  `;
+}
+
+// ==================== TAB: STRESS TESTS ====================
+function stressTestsTabHTML(plan){
+  const stressKey = stressTestSelection || 'gfc2008';
+  const stress = stressTestResult(plan, stressKey);
+  const survivor = plan.assumptions.survivorEvent;
+  const ltc = plan.assumptions.ltcEvent;
+  const baseline = monteCarloResult(plan, {retireAgeDelta:0,spendingPct:100,savingsPct:100,returnDelta:0}, 600, {seed:(plan.monteCarlo&&plan.monteCarlo.seed)||42});
+  const withSurvivor = plan.household.hasClient2 && survivor.enabled
+    ? monteCarloResult(plan, {retireAgeDelta:0,spendingPct:100,savingsPct:100,returnDelta:0}, 600, {seed:(plan.monteCarlo&&plan.monteCarlo.seed)||42, survivorEvent:survivor})
+    : null;
+  const withLtc = ltc.enabled
+    ? monteCarloResult(plan, {retireAgeDelta:0,spendingPct:100,savingsPct:100,returnDelta:0}, 600, {seed:(plan.monteCarlo&&plan.monteCarlo.seed)||42, ltcEvent:ltc})
+    : null;
+
+  return `
+  <div class="panel">
+    <h2>Sequence-of-Returns Risk</h2>
+    <p class="desc">Runs one deterministic path using a specific historical-style return sequence instead of random draws, so you can show a client exactly what that sequence would do to this plan.</p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+      ${Object.keys(STRESS_SCENARIOS).map(k=>`<button class="btn ${stressKey===k?'':'secondary'}" onclick="runStressTest('${k}')">${STRESS_SCENARIOS[k].label}</button>`).join('')}
+    </div>
+    ${stress ? `
+    <div class="summary-cards">
+      <div class="scard ${stress.failed?'bad':'good'}"><div class="label">Outcome</div><div class="value" style="font-size:16px;">${stress.failed?'Portfolio depleted':'Survived horizon'}</div></div>
+      <div class="scard"><div class="label">Lowest Balance</div><div class="value">${fmt$(stress.lowestBalance)}</div></div>
+      <div class="scard"><div class="label">Ending Balance</div><div class="value">${fmt$(stress.endingBalance)}</div></div>
+    </div>
+    ` : '<div class="empty">Enter a date of birth and retirement age to run the stress test.</div>'}
+  </div>
+
+  <div class="panel">
+    <h2>Survivor Scenario</h2>
+    <p class="desc">Models one spouse dying mid-plan: the survivor steps up to the larger of the two Social Security benefits (the deceased's own SS and pension otherwise stop), any life insurance proceeds entered below are added to the portfolio in that year, and ongoing spending is reduced by the factor below.</p>
+    ${!plan.household.hasClient2 ? '<div class="empty">This plan only has one household member — add a second client on the Household tab to model a survivor scenario.</div>' : `
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px;">
+      <input type="checkbox" ${survivor.enabled?'checked':''} onchange="update('assumptions.survivorEvent.enabled', this.checked); renderTab();"> Enable survivor scenario
+    </label>
+    ${survivor.enabled ? `
+    <div class="row">
+      <div class="field"><label>Who dies first?</label>
+        <select onchange="update('assumptions.survivorEvent.deathOwner', this.value); renderTab();">
+          <option value="client1" ${survivor.deathOwner==='client1'?'selected':''}>${esc(plan.household.client1.first)||'Client 1'}</option>
+          <option value="client2" ${survivor.deathOwner==='client2'?'selected':''}>${esc(plan.household.client2.first)||'Client 2'}</option>
+        </select>
+      </div>
+      <div class="field"><label>Age at death</label><input type="number" value="${survivor.deathAge}" onchange="update('assumptions.survivorEvent.deathAge', this.value); renderTab();"></div>
+      <div class="field"><label>Ongoing spending after death (% of prior)</label><input type="number" value="${survivor.spendingFactor}" onchange="update('assumptions.survivorEvent.spendingFactor', this.value); renderTab();"></div>
+      <div class="field"><label>Life insurance proceeds to portfolio</label><input type="number" value="${survivor.lifeInsuranceProceeds}" onchange="update('assumptions.survivorEvent.lifeInsuranceProceeds', this.value); renderTab();"></div>
+    </div>
+    ${withSurvivor ? `
+    <div class="summary-cards">
+      <div class="scard"><div class="label">Baseline Success Rate</div><div class="value">${baseline.successRate}%</div></div>
+      <div class="scard ${withSurvivor.successRate<baseline.successRate?'bad':'good'}"><div class="label">With Survivor Event</div><div class="value">${withSurvivor.successRate}%</div></div>
+    </div>` : ''}` : ''}`}
+  </div>
+
+  <div class="panel">
+    <h2>Long-Term-Care Event</h2>
+    <p class="desc">Layers a fixed-cost, time-boxed care window on top of normal retirement spending — e.g. a 3-year skilled nursing stay starting at age 82.</p>
+    <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:12px;">
+      <input type="checkbox" ${ltc.enabled?'checked':''} onchange="update('assumptions.ltcEvent.enabled', this.checked); renderTab();"> Enable LTC stress event
+    </label>
+    ${ltc.enabled ? `
+    <div class="row">
+      <div class="field"><label>Onset age</label><input type="number" value="${ltc.onsetAge}" onchange="update('assumptions.ltcEvent.onsetAge', this.value); renderTab();"></div>
+      <div class="field"><label>Duration (years)</label><input type="number" value="${ltc.durationYears}" onchange="update('assumptions.ltcEvent.durationYears', this.value); renderTab();"></div>
+      <div class="field"><label>Annual cost (today's $)</label><input type="number" value="${ltc.annualCost}" onchange="update('assumptions.ltcEvent.annualCost', this.value); renderTab();"></div>
+    </div>
+    ${withLtc ? `
+    <div class="summary-cards">
+      <div class="scard"><div class="label">Baseline Success Rate</div><div class="value">${baseline.successRate}%</div></div>
+      <div class="scard ${withLtc.successRate<baseline.successRate?'bad':'good'}"><div class="label">With LTC Event</div><div class="value">${withLtc.successRate}%</div></div>
+    </div>` : ''}` : ''}
+  </div>
+
+  <div class="note">Stress scenarios here are separate from the main Probability of Success projection — toggling them on doesn't change the headline success rate on that tab; it's a dedicated "what could go wrong" conversation tool.</div>
+  `;
+}
+
+// ==================== TAB: SCENARIOS & HISTORY ====================
+function saveCurrentScenario(){
+  const plan = getPlan(activeId);
+  const name = prompt('Name this scenario (e.g. "Base case", "Retire at 62"):');
+  if(!name) return;
+  const result = monteCarloResult(plan, whatIf, 600, {seed:(plan.monteCarlo&&plan.monteCarlo.seed)||42});
+  plan.scenarios = plan.scenarios || [];
+  plan.scenarios.unshift({
+    id: uid('scn'), name, createdAt: Date.now(),
+    assumptions: JSON.parse(JSON.stringify(plan.assumptions)),
+    whatIf: JSON.parse(JSON.stringify(whatIf)),
+    result: { successRate: result.successRate, medianEndingBalance: result.medianEndingBalance, yearsToRetire: result.yearsToRetire }
+  });
+  markDirty();
+  renderTab();
+}
+function deleteScenario(id){
+  const plan = getPlan(activeId);
+  plan.scenarios = (plan.scenarios||[]).filter(s=>s.id!==id);
+  markDirty();
+  renderTab();
+}
+function applyScenario(id){
+  const plan = getPlan(activeId);
+  const s = (plan.scenarios||[]).find(s=>s.id===id);
+  if(!s) return;
+  plan.assumptions = JSON.parse(JSON.stringify(s.assumptions));
+  whatIf = JSON.parse(JSON.stringify(s.whatIf));
+  markDirty();
+  setTab('montecarlo');
+}
+function fmtTs(ts){ return new Date(ts).toLocaleString(undefined, {dateStyle:'medium', timeStyle:'short'}); }
+
+function scenariosTabHTML(plan){
+  const scenarios = plan.scenarios || [];
+  const reportHistory = plan.reportHistory || [];
+  const auditLog = plan.auditLog || [];
+
+  return `
+  <div class="panel">
+    <div class="toolbar" style="margin-bottom:6px;">
+      <h2 style="margin:0;">Saved Scenarios</h2>
+      <button class="btn secondary" onclick="saveCurrentScenario()">+ Save current assumptions as scenario</button>
+    </div>
+    <p class="desc">Snapshots of the full assumption set (capital market assumptions, glide path, guardrails, retirement spending, What-If sliders) so you can compare named alternatives side by side without losing track of what produced which result.</p>
+    ${scenarios.length ? `
+    <table>
+      <thead><tr><th>Scenario</th><th>Saved</th><th>Success Rate</th><th>Median Ending Balance</th><th>Years to Retirement</th><th></th></tr></thead>
+      <tbody>
+        ${scenarios.map(s=>`<tr>
+          <td>${esc(s.name)}</td>
+          <td style="font-size:12px; color:var(--ink-dim);">${fmtTs(s.createdAt)}</td>
+          <td>${s.result.successRate}%</td>
+          <td>${fmt$(s.result.medianEndingBalance)}</td>
+          <td>${s.result.yearsToRetire}</td>
+          <td style="display:flex; gap:6px;">
+            <button class="btn secondary" style="padding:4px 8px; font-size:12px;" onclick="applyScenario('${s.id}')">Load</button>
+            <button class="removeX" onclick="deleteScenario('${s.id}')">✕</button>
+          </td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div class="empty">No saved scenarios yet — set up assumptions on the Probability of Success tab, then save a snapshot here.</div>'}
+  </div>
+
+  <div class="panel">
+    <h2>Delivered Report History</h2>
+    <p class="desc">A record of the assumptions in effect each time a PDF was generated for this client — so if an assumption changes later, there's a clear trail of what produced a report that already went out.</p>
+    ${reportHistory.length ? `
+    <table>
+      <thead><tr><th>Generated</th><th>By</th><th>Success Rate</th><th>Median Ending Balance</th><th>Trials / Seed</th></tr></thead>
+      <tbody>
+        ${reportHistory.map(r=>`<tr>
+          <td>${fmtTs(r.ts)}</td>
+          <td style="font-size:12px; color:var(--ink-dim);">${esc(r.user)}</td>
+          <td>${r.successRate}%</td>
+          <td>${fmt$(r.medianEndingBalance)}</td>
+          <td style="font-size:12px; color:var(--ink-dim);">${r.trials} / #${r.seed}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div class="empty">No PDF reports generated for this client yet.</div>'}
+  </div>
+
+  <div class="panel">
+    <h2>Assumptions Audit Log</h2>
+    <p class="desc">Tracks changes to assumptions, Social Security inputs, simulation trials, retirement age, and life expectancy — useful when a plan is shared across advisors. Field-level edits only (goal names, notes, etc. aren't logged).</p>
+    ${auditLog.length ? `
+    <table>
+      <thead><tr><th>When</th><th>By</th><th>Field</th><th>Old Value</th><th>New Value</th></tr></thead>
+      <tbody>
+        ${auditLog.slice(0,25).map(a=>`<tr>
+          <td style="font-size:12px; color:var(--ink-dim);">${fmtTs(a.ts)}</td>
+          <td style="font-size:12px; color:var(--ink-dim);">${esc(a.user)}</td>
+          <td style="font-family:monospace; font-size:12px;">${esc(a.path)}</td>
+          <td style="font-size:12px;">${esc(a.oldVal)}</td>
+          <td style="font-size:12px;">${esc(a.newVal)}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>` : '<div class="empty">No tracked changes yet.</div>'}
+  </div>
+  `;
+}
+
+// ==================== TAB: WHAT-IF / ELASTICITY ====================
+function whatIfSlider(id, label, value, min, max, step, displayFn){
+  return `
+  <div class="slider-row">
+    <div class="sr-head"><span>${label}</span><span class="sr-val" id="${id}Val">${displayFn(value)}</span></div>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}" oninput="onWhatIfChange('${id}', this.value)">
+  </div>`;
+}
+
+let whatIfSidebarDebounce = null;
+function onWhatIfChange(id, val){
+  val = parseFloat(val);
+  if(id==='wiRetireAge') whatIf.retireAgeDelta = val;
+  else if(id==='wiSpending') whatIf.spendingPct = val;
+  else if(id==='wiSavings') whatIf.savingsPct = val;
+  else if(id==='wiReturn') whatIf.returnDelta = val;
+  // Live-update just the value labels + result panel, without a full re-render (keeps slider drag smooth).
+  const labels = {wiRetireAge:(v)=> (v>=0?'+':'')+v+' yrs', wiSpending:(v)=>v+'%', wiSavings:(v)=>v+'%', wiReturn:(v)=>(v>=0?'+':'')+v+'%'};
+  const lbl = $id(id+'Val'); if(lbl) lbl.textContent = labels[id](val);
+  const plan = getPlan(activeId);
+  const result = monteCarloResult(plan, whatIf, 400, {seed:(plan.monteCarlo&&plan.monteCarlo.seed)||42});
+  const resultWrap = $id('whatIfResult');
+  if(resultWrap) resultWrap.innerHTML = whatIfResultHTML(result);
+  // The sidebar recomputes every client's success dot — debounce so a slider drag doesn't
+  // re-run the full roster on every animation frame.
+  clearTimeout(whatIfSidebarDebounce);
+  whatIfSidebarDebounce = setTimeout(renderClientList, 200);
+}
+
+function whatIfResultHTML(result){
+  if(result.trials===0) return '<div class="empty">Not enough data to project.</div>';
+  const rate = result.successRate;
+  const tone = rate>=80 ? 'good' : rate>=60 ? 'warn' : 'bad';
+  const barColor = rate>=80 ? 'var(--good)' : rate>=60 ? 'var(--warn)' : 'var(--bad)';
+  return `
+    <div class="pos-meter">
+      <div><div class="pos-num ${tone}">${rate}%</div><div class="pos-label">Probability of Success</div></div>
+      <div class="pos-track"><div class="pos-fill" style="width:${rate}%; background:${barColor};"></div></div>
+    </div>
+    <div style="margin-top:10px; font-size:12.5px; color:var(--ink-dim);">Median ending balance: ${fmt$(result.medianEndingBalance)}</div>
+  `;
+}
+
+function resetWhatIf(){
+  whatIf = {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0};
+  renderTab();
+}
+
+function whatIfTabHTML(plan){
+  const baseline = monteCarloResult(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}, 400, {seed:(plan.monteCarlo&&plan.monteCarlo.seed)||42});
+  const current = monteCarloResult(plan, whatIf, 400, {seed:(plan.monteCarlo&&plan.monteCarlo.seed)||42});
+  return `
+  <div class="panel">
+    <h2>What-If / Elasticity Testing</h2>
+    <p class="desc">Drag the levers to see how retirement age, spending, savings, and expected return move the probability of success — this is the client-facing "play zone" conversation. Changes here don't get saved to the plan; they're for live discussion. Use the Household/Cash Flow/Assumptions tabs to actually change the plan's baseline.</p>
+    <div class="row">
+      <div style="flex:1; min-width:280px;">
+        ${whatIfSlider('wiRetireAge','Retirement age', whatIf.retireAgeDelta, -10, 10, 1, v=>(v>=0?'+':'')+v+' yrs')}
+        ${whatIfSlider('wiSpending','Retirement spending', whatIf.spendingPct, 60, 140, 5, v=>v+'%')}
+        ${whatIfSlider('wiSavings','Pre-retirement savings rate', whatIf.savingsPct, 0, 200, 5, v=>v+'%')}
+        ${whatIfSlider('wiReturn','Expected return adjustment', whatIf.returnDelta, -3, 3, 0.25, v=>(v>=0?'+':'')+v+'%')}
+        <button class="btn secondary" onclick="resetWhatIf()">Reset to baseline</button>
+      </div>
+      <div style="flex:1; min-width:280px;">
+        <div class="subhead">Baseline</div>
+        ${whatIfResultHTML(baseline)}
+        <div class="divider"></div>
+        <div class="subhead">With adjustments</div>
+        <div id="whatIfResult">${whatIfResultHTML(current)}</div>
+      </div>
+    </div>
+  </div>
+  `;
+}
+
+// ==================== TAB: SOCIAL SECURITY ====================
+function socSecTabHTML(plan){
+  const ss = plan.socialSecurity;
+  const table1 = ss.pia1 ? ssComparisonTable(ss.pia1, ss.fra1) : [];
+  const table2 = (plan.household.hasClient2 && ss.pia2) ? ssComparisonTable(ss.pia2, ss.fra2) : [];
+  const breakeven1 = ss.pia1 ? ssBreakevenAge(ss.pia1, ss.fra1, 62, 70) : null;
+
+  const renderTable = (rows, claimAge) => rows.length ? `
+    <table>
+      <thead><tr><th>Claim Age</th><th>Monthly Benefit</th><th>Annual Benefit</th></tr></thead>
+      <tbody>${rows.map(r=>`<tr style="${r.age===num(claimAge)?'background:#eaf0fe;':''}"><td>${r.age}${r.age===62?' (earliest)':r.age===70?' (max)':''}</td><td>${fmt$(r.monthly)}</td><td>${fmt$(r.annual)}</td></tr>`).join('')}</tbody>
+    </table>` : '<div class="empty">Enter a Primary Insurance Amount (PIA) to see the claiming-age comparison.</div>';
+
+  return `
+  <div class="panel">
+    <h2>Client 1</h2>
+    <div class="row">
+      <div class="field"><label>Primary Insurance Amount (monthly, at Full Retirement Age)</label><input type="number" value="${ss.pia1}" onchange="update('socialSecurity.pia1', this.value); renderTab();"></div>
+      <div class="field"><label>Full Retirement Age (FRA)</label><input type="number" step="0.5" value="${ss.fra1}" onchange="update('socialSecurity.fra1', this.value); renderTab();"></div>
+      <div class="field"><label>Planned claiming age</label><input type="number" step="0.5" min="62" max="70" value="${ss.claimAge1}" onchange="update('socialSecurity.claimAge1', this.value); renderTab(); renderClientList();"></div>
+    </div>
+    <div class="subhead">Claiming-Age Comparison</div>
+    ${renderTable(table1, ss.claimAge1)}
+    ${breakeven1 ? `<div style="margin-top:10px; font-size:12.5px; color:var(--ink-dim);">Breakeven age (claim 70 vs. 62): roughly age <strong>${breakeven1}</strong> — after that, delaying to 70 wins on cumulative lifetime benefit.</div>` : ''}
+  </div>
+
+  ${plan.household.hasClient2 ? `
+  <div class="panel">
+    <h2>Client 2</h2>
+    <div class="row">
+      <div class="field"><label>Primary Insurance Amount (monthly, at Full Retirement Age)</label><input type="number" value="${ss.pia2}" onchange="update('socialSecurity.pia2', this.value); renderTab();"></div>
+      <div class="field"><label>Full Retirement Age (FRA)</label><input type="number" step="0.5" value="${ss.fra2}" onchange="update('socialSecurity.fra2', this.value); renderTab();"></div>
+      <div class="field"><label>Planned claiming age</label><input type="number" step="0.5" min="62" max="70" value="${ss.claimAge2}" onchange="update('socialSecurity.claimAge2', this.value); renderTab(); renderClientList();"></div>
+    </div>
+    <div class="subhead">Claiming-Age Comparison</div>
+    ${renderTable(table2, ss.claimAge2)}
+  </div>` : ''}
+
+  <div class="panel">
+    <h2>Pensions</h2>
+    <table>
+      <thead><tr><th>Owner</th><th>Monthly Amount</th><th>Start Age</th><th></th></tr></thead>
+      <tbody>${plan.pensions.map((p,i)=>`
+        <tr>
+          <td><select class="compact" onchange="updatePension(${i},'owner',this.value)">
+            <option value="client1" ${p.owner==='client1'?'selected':''}>Client 1</option>
+            ${plan.household.hasClient2?`<option value="client2" ${p.owner==='client2'?'selected':''}>Client 2</option>`:''}
+          </select></td>
+          <td><input class="compact" type="number" value="${p.monthlyAmount}" onchange="updatePension(${i},'monthlyAmount',this.value)"></td>
+          <td><input class="compact" type="number" value="${p.startAge}" onchange="updatePension(${i},'startAge',this.value)"></td>
+          <td><button class="removeX" onclick="removePension(${i})">✕</button></td>
+        </tr>`).join('') || '<tr><td colspan="4" style="color:#bbb;">No pensions entered.</td></tr>'}</tbody>
+    </table>
+    <button class="addRowBtn" onclick="addPension()">+ Add pension</button>
+  </div>
+
+  <div class="note"><strong>Methodology:</strong> Uses the SSA's standard actuarial reduction/increase factors (5/9 of 1% per month for the first 36 months before FRA, 5/12 of 1% per month beyond that, and 2/3 of 1% per month of delayed retirement credit up to age 70). This is an estimate for planning conversations, not a substitute for the client's actual SSA benefit statement.</div>
+  `;
+}
+function addPension(){ const plan=getPlan(activeId); plan.pensions.push({id:uid('pen'), owner:'client1', monthlyAmount:'', startAge:65}); renderTab(); }
+function removePension(idx){ const plan=getPlan(activeId); plan.pensions.splice(idx,1); renderTab(); }
+function updatePension(idx, field, val){ const plan=getPlan(activeId); plan.pensions[idx][field]=val; renderTab(); }
+
+// ==================== TAB: INSURANCE NEEDS ====================
+function insuranceOwnerBlockHTML(plan, ownerKey, label, show){
+  if(!show) return '';
+  const ins = plan.insurance[ownerKey];
+  const result = lifeInsuranceNeed(plan, ownerKey);
+  return `
+  <div class="panel">
+    <h2>Life Insurance — ${label}</h2>
+    <div class="row">
+      <div class="field"><label>Income replacement (years)</label><input type="number" value="${ins.incomeReplaceYears}" onchange="update('insurance.${ownerKey}.incomeReplaceYears', this.value); renderTab();"></div>
+      <div class="field"><label>Existing coverage</label><input type="number" value="${ins.existingCoverage}" onchange="update('insurance.${ownerKey}.existingCoverage', this.value); renderTab();"></div>
+      <div class="field"><label>Debt to pay off</label><input type="number" value="${ins.debtPayoff}" onchange="update('insurance.${ownerKey}.debtPayoff', this.value); renderTab();"></div>
+      <div class="field"><label>Final expenses</label><input type="number" value="${ins.finalExpenses}" onchange="update('insurance.${ownerKey}.finalExpenses', this.value); renderTab();"></div>
+      <div class="field"><label>Future education funding to cover</label><input type="number" value="${ins.eduFundGoal}" onchange="update('insurance.${ownerKey}.eduFundGoal', this.value); renderTab();"></div>
+    </div>
+    <div class="summary-cards" style="margin-top:6px;">
+      <div class="scard"><div class="label">Income to Replace / yr</div><div class="value">${fmt$(result.ownerIncome)}</div></div>
+      <div class="scard"><div class="label">Gross Need</div><div class="value">${fmt$(result.gross)}</div></div>
+      <div class="scard bad"><div class="label">Coverage Gap</div><div class="value">${fmt$(result.need)}</div></div>
+    </div>
+  </div>`;
+}
+function disabilityOwnerBlockHTML(plan, ownerKey, label, show){
+  if(!show) return '';
+  const d = plan.insurance[ownerKey];
+  const result = disabilityGap(plan, ownerKey);
+  return `
+  <div class="panel">
+    <h2>Disability Insurance — ${label}</h2>
+    <div class="row">
+      <div class="field"><label>Monthly expenses to cover</label><input type="number" value="${d.monthlyExpenses}" onchange="update('insurance.${ownerKey}.monthlyExpenses', this.value); renderTab();"></div>
+      <div class="field"><label>Existing disability benefit (monthly)</label><input type="number" value="${d.existingBenefit}" onchange="update('insurance.${ownerKey}.existingBenefit', this.value); renderTab();"></div>
+    </div>
+    <div class="summary-cards" style="margin-top:6px;">
+      <div class="scard bad"><div class="label">Monthly Gap</div><div class="value">${fmt$(result.gap)}</div></div>
+    </div>
+  </div>`;
+}
+function insuranceTabHTML(plan){
+  return `
+  ${insuranceOwnerBlockHTML(plan, 'life1', 'Client 1', true)}
+  ${insuranceOwnerBlockHTML(plan, 'life2', 'Client 2', plan.household.hasClient2)}
+  ${disabilityOwnerBlockHTML(plan, 'disability1', 'Client 1', true)}
+  ${disabilityOwnerBlockHTML(plan, 'disability2', 'Client 2', plan.household.hasClient2)}
+  <div class="note"><strong>Methodology:</strong> Life insurance need uses a simplified income-replacement + debt + final-expenses + education approach (DIME-style), net of existing coverage. It does not net out liquid net worth or run a full human-life-value calculation — the advisor should apply judgment on whether other assets should offset the need. Disability gap is a simple monthly-expense-minus-existing-benefit calculation and does not account for elimination periods, benefit taxability, or own-occupation vs. any-occupation definitions.</div>
+  `;
+}
+
+// ==================== TAB: EDUCATION FUNDING ====================
+function addEducationGoal(){
+  const plan = getPlan(activeId);
+  plan.education.push({id:uid('edu'), name:'', currentAge:'', collegeAge:18, yearsInCollege:4, currentCostPerYear:'', inflationRate:5, currentSavings:'', monthlyContribution:''});
+  renderTab();
+}
+function removeEducationGoal(idx){ const plan=getPlan(activeId); plan.education.splice(idx,1); renderTab(); }
+function updateEducationGoal(idx, field, val){ const plan=getPlan(activeId); plan.education[idx][field]=val; if(field!=='name') renderTab(); }
+
+function educationTabHTML(plan){
+  if(!plan.education.length){
+    return `<div class="panel"><h2>Education Funding</h2><div class="empty">No education goals yet.</div><button class="addRowBtn" onclick="addEducationGoal()">+ Add education goal</button></div>`;
+  }
+  return plan.education.map((g,i)=>{
+    const proj = educationProjection(g);
+    const shortfall = proj.requiredMonthly - proj.currentMonthlyContribution;
+    return `
+    <div class="panel">
+      <div class="toolbar" style="margin-bottom:14px;">
+        <h2 style="margin:0;">${g.name || 'Education goal '+(i+1)}</h2>
+        <button class="removeX" onclick="removeEducationGoal(${i})">✕ Remove</button>
+      </div>
+      <div class="row">
+        <div class="field"><label>Beneficiary name</label><input value="${g.name||''}" onchange="updateEducationGoal(${i},'name',this.value)"></div>
+        <div class="field"><label>Current age</label><input type="number" value="${g.currentAge}" onchange="updateEducationGoal(${i},'currentAge',this.value)"></div>
+        <div class="field"><label>Age starting college</label><input type="number" value="${g.collegeAge}" onchange="updateEducationGoal(${i},'collegeAge',this.value)"></div>
+        <div class="field"><label>Years in college</label><input type="number" value="${g.yearsInCollege}" onchange="updateEducationGoal(${i},'yearsInCollege',this.value)"></div>
+      </div>
+      <div class="row">
+        <div class="field"><label>Current annual cost (today's $)</label><input type="number" value="${g.currentCostPerYear}" onchange="updateEducationGoal(${i},'currentCostPerYear',this.value)"></div>
+        <div class="field"><label>Education cost inflation %</label><input type="number" step="0.1" value="${g.inflationRate}" onchange="updateEducationGoal(${i},'inflationRate',this.value)"></div>
+        <div class="field"><label>Current savings (529, etc.)</label><input type="number" value="${g.currentSavings}" onchange="updateEducationGoal(${i},'currentSavings',this.value)"></div>
+        <div class="field"><label>Current monthly contribution</label><input type="number" value="${g.monthlyContribution}" onchange="updateEducationGoal(${i},'monthlyContribution',this.value)"></div>
+      </div>
+      <div class="summary-cards">
+        <div class="scard"><div class="label">Years Until College</div><div class="value">${proj.yearsUntilCollege}</div></div>
+        <div class="scard"><div class="label">Future Total Cost</div><div class="value">${fmt$(proj.futureTotalCost)}</div></div>
+        <div class="scard"><div class="label">Funding Gap (future $)</div><div class="value">${fmt$(proj.gap)}</div></div>
+        <div class="scard ${shortfall>0?'bad':'good'}"><div class="label">Required Monthly Savings</div><div class="value">${fmt$(proj.requiredMonthly)}</div></div>
+      </div>
+      ${shortfall>0 ? `<div class="gap-flag over">Currently saving ${fmt$(proj.currentMonthlyContribution)}/mo — short by ${fmt$(shortfall)}/mo</div>` : `<div class="gap-flag aligned">Current contribution covers the projected gap</div>`}
+    </div>`;
+  }).join('') + `<button class="addRowBtn" onclick="addEducationGoal()">+ Add another education goal</button>
+  <div class="note" style="margin-top:16px;"><strong>Methodology:</strong> Future cost assumes the entered education-cost inflation rate compounds through each year of college. Savings are assumed to grow at 6%/yr (a simplified 529-style blended-allocation assumption, not editable per-goal in this version). Required monthly savings solves for the ordinary-annuity payment that closes the gap by the time college starts.</div>`;
+}
+
+// ==================== PDF REPORT ====================
+function buildPlanPDF(clientId){
+  const sc = getSharedClient(clientId);
+  const plan = getPlan(clientId);
+  const name = clientName(sc);
+  const nw = netWorthTotals(plan);
+  const cf = cashFlowTotals(plan);
+  const mc = monteCarloResult(plan, {retireAgeDelta:0, spendingPct:100, savingsPct:100, returnDelta:0}, null, {storePaths:true});
+  const rate = mc.successRate;
+  const pdfStartYear = new Date().getFullYear();
+
+  const assetRows = plan.netWorth.assets.map(a=>`<tr><td>${esc(a.name)}</td><td>${esc(a.category)}</td><td>${fmt$(a.value)}</td></tr>`).join('');
+  const liabRows = plan.netWorth.liabilities.map(l=>`<tr><td>${esc(l.name)}</td><td>${esc(l.category)}</td><td>${fmt$(l.balance)}</td></tr>`).join('');
+  const goalRows = plan.goals.map(g=>`<tr><td>${esc(g.name)}</td><td>${esc(g.type)}</td><td style="text-transform:capitalize;">${esc(g.priority)}</td><td>${esc(g.targetYear)}</td><td>${fmt$(g.amountToday)}</td></tr>`).join('');
+
+  const ss = plan.socialSecurity;
+  const ssTable1 = ss.pia1 ? ssComparisonTable(ss.pia1, ss.fra1).map(r=>`<tr><td>${r.age}</td><td>${fmt$(r.monthly)}</td><td>${fmt$(r.annual)}</td></tr>`).join('') : '';
+
+  const life1 = lifeInsuranceNeed(plan, 'life1');
+  const life2 = plan.household.hasClient2 ? lifeInsuranceNeed(plan, 'life2') : null;
+
+  const eduRows = plan.education.map(g=>{
+    const proj = educationProjection(g);
+    return `<tr><td>${esc(g.name)}</td><td>${proj.yearsUntilCollege}</td><td>${fmt$(proj.futureTotalCost)}</td><td>${fmt$(proj.gap)}</td><td>${fmt$(proj.requiredMonthly)}</td></tr>`;
+  }).join('');
+
+  return `
+    <div class="pdf-letterhead">
+      <div class="firm">Redmount Capital Partners LLC</div>
+      <div class="addr">23 Corporate Plaza Drive, Suite 150, Newport Beach, CA 92660</div>
+    </div>
+    <div class="pdf-title">Financial Plan — ${esc(name)}</div>
+    <div class="pdf-sub">Prepared ${new Date().toLocaleDateString()}</div>
+
+    <div class="pdf-section">
+      <h3>Summary</h3>
+      <div class="pdf-scores">
+        <div class="s"><div class="num">${rate!==null?rate+'%':'—'}</div><div class="lbl">Probability of Success</div></div>
+        <div class="s"><div class="num">${fmt$(nw.net)}</div><div class="lbl">Net Worth</div></div>
+        <div class="s"><div class="num">${fmt$(cf.net)}</div><div class="lbl">Net Cash Flow / yr</div></div>
+        <div class="s"><div class="num">${fmt$(investablePortfolioValue(plan))}</div><div class="lbl">Investable Portfolio</div></div>
+      </div>
+    </div>
+
+    <div class="pdf-section">
+      <h3>Net Worth</h3>
+      <div class="pdf-grid two">
+        <div>
+          <div style="font-size:11px; font-weight:700; margin-bottom:4px;">Assets — ${fmt$(nw.assets)}</div>
+          <table class="pdf-table"><thead><tr><th>Name</th><th>Category</th><th>Value</th></tr></thead><tbody>${assetRows || '<tr><td colspan="3" style="color:#bbb;">None</td></tr>'}</tbody></table>
+        </div>
+        <div>
+          <div style="font-size:11px; font-weight:700; margin-bottom:4px;">Liabilities — ${fmt$(nw.liabilities)}</div>
+          <table class="pdf-table"><thead><tr><th>Name</th><th>Category</th><th>Balance</th></tr></thead><tbody>${liabRows || '<tr><td colspan="3" style="color:#bbb;">None</td></tr>'}</tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <div class="pdf-section">
+      <h3>Cash Flow</h3>
+      <div class="pdf-grid">
+        <div class="pdf-field"><div class="l">Total Income</div><div class="v">${fmt$(cf.income)}</div></div>
+        <div class="pdf-field"><div class="l">Total Expenses</div><div class="v">${fmt$(cf.expenses)}</div></div>
+        <div class="pdf-field"><div class="l">Net Cash Flow</div><div class="v">${fmt$(cf.net)}</div></div>
+      </div>
+    </div>
+
+    <div class="pdf-section">
+      <h3>Goals</h3>
+      <table class="pdf-table"><thead><tr><th>Goal</th><th>Type</th><th>Priority</th><th>Target Year</th><th>Amount (today's $)</th></tr></thead>
+        <tbody>${goalRows || '<tr><td colspan="5" style="color:#bbb;">No goals entered</td></tr>'}</tbody></table>
+    </div>
+
+    <div class="pdf-page-break">
+      <div class="pdf-letterhead">
+        <div class="firm">Redmount Capital Partners LLC</div>
+        <div class="addr">23 Corporate Plaza Drive, Suite 150, Newport Beach, CA 92660</div>
+      </div>
+      <div class="pdf-title">Probability of Success — ${esc(name)}</div>
+      <div class="pdf-section">
+        <div class="pdf-scores">
+          <div class="s"><div class="num">${rate!==null?rate+'%':'—'}</div><div class="lbl">Success Rate</div></div>
+          <div class="s"><div class="num">${mc.yearsToRetire??'—'}</div><div class="lbl">Years to Retirement</div></div>
+          <div class="s"><div class="num">${mc.yearsInRetirement??'—'}</div><div class="lbl">Years in Retirement</div></div>
+          <div class="s"><div class="num">${mc.medianEndingBalance!==null&&mc.medianEndingBalance!==undefined?fmt$(mc.medianEndingBalance):'—'}</div><div class="lbl">Median Ending Balance</div></div>
+        </div>
+        <div style="font-size:10px; color:var(--ink-dim); margin-top:6px;">Monte Carlo simulation (${mc.trials||0} trials, seed #${plan.monteCarlo.seed}). Illustrative planning estimate — not a guarantee of any outcome. See methodology on the final page.</div>
+      </div>
+      ${mc.percentiles ? `<div class="pdf-section"><h3>Portfolio Balance Range</h3>${buildFanChartSVG(mc.percentiles, mc.yearsToRetire, pdfStartYear)}</div>` : ''}
+
+      <div class="pdf-section">
+        <h3>Social Security — Client 1</h3>
+        ${ss.pia1 ? `<table class="pdf-table"><thead><tr><th>Claim Age</th><th>Monthly</th><th>Annual</th></tr></thead><tbody>${ssTable1}</tbody></table>` : '<div style="color:#bbb; font-size:11px;">Not entered</div>'}
+      </div>
+
+      <div class="pdf-section">
+        <h3>Life Insurance Needs</h3>
+        <table class="pdf-table">
+          <thead><tr><th></th><th>Income to Replace</th><th>Gross Need</th><th>Existing Coverage</th><th>Gap</th></tr></thead>
+          <tbody>
+            <tr><td>Client 1</td><td>${fmt$(life1.ownerIncome)}</td><td>${fmt$(life1.gross)}</td><td>${fmt$(life1.existingCoverage)}</td><td>${fmt$(life1.need)}</td></tr>
+            ${life2 ? `<tr><td>Client 2</td><td>${fmt$(life2.ownerIncome)}</td><td>${fmt$(life2.gross)}</td><td>${fmt$(life2.existingCoverage)}</td><td>${fmt$(life2.need)}</td></tr>` : ''}
+          </tbody>
+        </table>
+      </div>
+
+      ${plan.education.length ? `
+      <div class="pdf-section">
+        <h3>Education Funding</h3>
+        <table class="pdf-table">
+          <thead><tr><th>Beneficiary</th><th>Years Until College</th><th>Future Total Cost</th><th>Funding Gap</th><th>Required Monthly</th></tr></thead>
+          <tbody>${eduRows}</tbody>
+        </table>
+      </div>` : ''}
+    </div>
+
+    <div class="pdf-page-break">
+      <div class="pdf-letterhead">
+        <div class="firm">Redmount Capital Partners LLC</div>
+        <div class="addr">23 Corporate Plaza Drive, Suite 150, Newport Beach, CA 92660</div>
+      </div>
+      <div class="pdf-title">Disclosures &amp; Methodology</div>
+      <div class="pdf-section">
+        <h3>Probability of Success</h3>
+        <div class="pdf-notes">A three-asset-class (equity/bond/cash) Monte Carlo simulation with a glide path from the pre- to post-retirement equity weight on file, correlated annual returns (equity/bond mildly negatively correlated), and true lognormal per-year draws from the capital market assumptions on file. Guaranteed income (Social Security, pensions) is included starting in the actual year each benefit begins, not automatically at retirement. Does not model taxes beyond an optional flat withdrawal drag, Medicare or long-term-care costs, or Roth-conversion / tax-bracket sequencing. A directional planning signal, not a guarantee of future performance or outcome.</div>
+      </div>
+      <div class="pdf-section">
+        <h3>Social Security</h3>
+        <div class="pdf-notes">Estimates use the Social Security Administration's standard actuarial reduction and delayed-retirement-credit factors applied to the Primary Insurance Amount (PIA) entered. Not a substitute for the client's official SSA benefit statement.</div>
+      </div>
+      <div class="pdf-section">
+        <h3>Insurance Needs</h3>
+        <div class="pdf-notes">Life insurance need uses a simplified income-replacement plus debt plus final-expenses plus education approach, net of existing coverage — it does not net out liquid net worth or perform a full human-life-value calculation. Disability gap is monthly expenses minus existing benefit, without regard to elimination periods or benefit taxability.</div>
+      </div>
+      <div class="pdf-section">
+        <h3>Education Funding</h3>
+        <div class="pdf-notes">Future cost compounds the entered education-cost inflation rate through each year of college. Savings are assumed to grow at a blended 6%/yr. Required monthly savings solves for the ordinary-annuity payment needed to close the funding gap by the time college starts.</div>
+      </div>
+      <div class="pdf-sig-row">
+        <div class="pdf-sig">Client acknowledges review of this plan &nbsp;&nbsp;&nbsp;&nbsp; Date</div>
+        <div class="pdf-sig">Advisor &nbsp;&nbsp;&nbsp;&nbsp; Date</div>
+      </div>
+    </div>
+  `;
+}
+
+function downloadPlanPDF(clientId){
+  const plan = getPlan(clientId);
+  $id('printArea').innerHTML = buildPlanPDF(clientId);
+  window.print();
+  if(plan){
+    const mc = monteCarloResult(plan, {retireAgeDelta:0,spendingPct:100,savingsPct:100,returnDelta:0}, null, {seed:plan.monteCarlo.seed});
+    plan.reportHistory = plan.reportHistory || [];
+    plan.reportHistory.unshift({
+      id: uid('rpt'), ts: Date.now(), user: currentUserEmail(),
+      successRate: mc.successRate, medianEndingBalance: mc.medianEndingBalance,
+      assumptionsSnapshot: JSON.parse(JSON.stringify(plan.assumptions)),
+      trials: plan.monteCarlo.trials, seed: plan.monteCarlo.seed
+    });
+    if(plan.reportHistory.length>20) plan.reportHistory.length = 20;
+    markDirty();
+    forceSavePlan(clientId);
+  }
+}
+window.addEventListener('afterprint', ()=>{ const p = $id('printArea'); if(p) p.innerHTML = ''; });
+
+// ==================== BOOTSTRAP ====================
+document.addEventListener('DOMContentLoaded', function(){
+  const toolSwitcher = $id('toolSwitcher');
+  if(toolSwitcher) toolSwitcher.addEventListener('change', function(){ if(this.value) window.location.href = this.value; });
+  tryAutoLogin();
+});
+</script>
+</body>
+</html>
